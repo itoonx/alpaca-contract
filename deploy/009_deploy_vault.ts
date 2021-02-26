@@ -14,17 +14,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const FAIR_LAUNCH_ADDR = '0x19C64173a4fD5C2Db375f68444B2aA3070e0de08';
+  const FAIR_LAUNCH_ADDR = '0xA625AB01B08ce023B2a342Dbb12a16f2C8489A8F';
   const ALLOC_POINT_FOR_DEPOSIT = 100;
   const ALLOC_POINT_FOR_OPEN_POSITION = 100;
-  const CONFIG_ADDR = '0x6264bAc912F046a05950f852d1B65a31Fe756d9A';
+  const CONFIG_ADDR = '0xd7b805E88c5F52EDE71a9b93F7048c8d632DBEd4';
   const BASE_TOKEN_ADDR = '0xe9e7cea3dedca5984780bafc599bd69add087d56'
   const VAULT_NAME = 'BUSD VAULT'
   const NAME = 'Interest Bearing BUSD'
   const SYMBOL = 'ibBUSD';
-  const WNATIVE_RELAYER_ADDR = '0xbfAA2fF97068EcbC4eF6c3f3cb04ecdD7d3B9175';
+  const WNATIVE_RELAYER_ADDR = '0xE1D2CA01bc88F325fF7266DD2165944f3CAf0D3D';
 
-  const TIMELOCK = '';
+  const TIMELOCK = '0x2D5408f2287BF9F9B05404794459a846651D0a59';
 
 
 
@@ -67,7 +67,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await fairLaunch.addPool(ALLOC_POINT_FOR_OPEN_POSITION, (await vault.debtToken()), false, { gasLimit: '2000000' });
   console.log("✅ Done");
 
-  console.log(">> Slpee for 10000msec waiting for fairLaunch to update the pool");
+  console.log(">> Sleep for 10000msec waiting for fairLaunch to update the pool");
   await new Promise(resolve => setTimeout(resolve, 10000));
   console.log("✅ Done");
 

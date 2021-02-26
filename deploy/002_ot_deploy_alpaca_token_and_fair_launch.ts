@@ -14,14 +14,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   ░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝╚═╝░░╚══╝░╚═════╝░
   Check all variables below before execute the deployment script
   */
-
   const ALPACA_REWARD_PER_BLOCK = ethers.utils.parseEther('20');
   const BONUS_MULTIPLIER = 7;
-  const BONUS_END_BLOCK = '5594166';
+  const BONUS_END_BLOCK = '5661200';
   const BONUS_LOCK_BPS = '7000';
-  const START_BLOCK = '5190966';
-  const TIMELOCK = '';
-
+  const START_BLOCK = '5258000';
 
 
 

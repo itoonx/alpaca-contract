@@ -15,7 +15,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   */
 
   const ROUTER = '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F';
-  const TIMELOCK = '';
+  const TIMELOCK = '0x2D5408f2287BF9F9B05404794459a846651D0a59';
 
 
 
