@@ -52,7 +52,7 @@
     "test": "hardhat test --no-compile",
     "testnet": "hardhat console --no-compile --network testnet",
     "deploy:kovan": "truffle migrate --network kovan",
-    "coverage": "solidity-coverage",
+    "coverage": "hardhat coverage",
     "ganache": "ganache-cli",
     "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
     "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol",
@@ -86,6 +86,7 @@
     "@uniswap/v2-core": "^1.0.1",
     "chai-bn": "^0.2.1",
     "hardhat-deploy": "^0.7.0-beta.45",
+    "solidity-coverage": "^0.7.15",
     "synthetix": "^2.39.2"
   },
   "prettier": {
