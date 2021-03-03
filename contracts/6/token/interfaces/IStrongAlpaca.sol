@@ -1,6 +1,6 @@
 pragma solidity 0.6.6;
 
-interface IStrongHodl {
+interface IStrongAlpaca {
   function hodl() external;
   function noHodl() external;
 }

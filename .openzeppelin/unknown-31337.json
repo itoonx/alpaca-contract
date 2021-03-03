@@ -2,8 +2,8 @@
   "manifestVersion": "3.1",
   "impls": {
     "dc6e334931f4d334fc81dece778fc3093a8e2fc3b061e65f1782a23c4eab4c0b": {
-      "address": "0x99fEb160F3C7FA575a426c15a47Cc5927CFFB462",
-      "txHash": "0x5f096ae5ac9ed4b7d8b213391e6dbb492348c1a217658be14201ef8bcde83cca",
+      "address": "0x0bF0AEbBC786a5eba64dC40762B51c2293313C21",
+      "txHash": "0x9848f090b4105459536ac5422fd28f1643e58bb1c84fc2d14d37bf831023dd86",
       "layout": {
         "storage": [
           {
@@ -120,8 +120,8 @@
       }
     },
     "d7ce81080628c6da5f97d698a902da85f7578fa00b96a7f747803be4f8388144": {
-      "address": "0xac60E3339fb02648ee3974d295F5a50837fDA6A4",
-      "txHash": "0x0e1d0c8567ed749cc8a06fe888492bd552fac46669bb07d3a6163073d5cc3bac",
+      "address": "0xBd14F54e5A624447D4561baD20040C054c094C20",
+      "txHash": "0x5d241895519929a19caa453dff0f7c9aa372aef555ff1343dad956dd3fe087bd",
       "layout": {
         "storage": [
           {
@@ -253,8 +253,8 @@
       }
     },
     "f837206ea7531c10dd48f7528a75c4b7c512b3c95f812a9fff53025f969559c1": {
-      "address": "0x55C64CaADE2F9E6Ce4Ae225580d005CEB97EAAB7",
-      "txHash": "0x7103bec5ce6e80ee7467d7bacb508557bfedcea991ad3f53196d3d7e7b2d9094",
+      "address": "0x53a20c0a2B86243F78d1A4788018c2eAf36733AB",
+      "txHash": "0xe6e93839da1ce0abcf3e758ddc92a741723937e030b4c332fbad310828120fe8",
       "layout": {
         "storage": [
           {
@@ -484,8 +484,8 @@
       }
     },
     "e5176cef0c3d0fd30d509ac44387fdbc45ad0c475cd081f858c21dd071cc597f": {
-      "address": "0xaC166c996BB247d78f822FD197D2b3c09C47678E",
-      "txHash": "0xd126c950c9399d98e7f3f301214161f20dfaf05b5d0b55c97e6e6d91dcc70e44",
+      "address": "0x9d52FfE4714d74b477881DD30f7aC60b295FE03D",
+      "txHash": "0xb5ff3be8338f14d53abf911d4cd62992b71b795bd4e1f25ecd673d7d26bfc977",
       "layout": {
         "storage": [
           {
@@ -575,8 +575,8 @@
       }
     },
     "026142ba7a51ea17afdba8db51649e139fcb3a6937b369582ba7b8c94ee88cea": {
-      "address": "0x8fD086738440f77f2Af78A633c775c9965103e42",
-      "txHash": "0xe55bcac0b6f13c406127ddaa641c36f09ce4b8de86e8893e484aa5e9a6fef72e",
+      "address": "0x1Ec71B466aa88D2baBcf9F09028B0f804c1e663e",
+      "txHash": "0x1898309f9b58fba476a91e8c6bb5a7175d60f674ec7fdfe55e0bd51f3909780d",
       "layout": {
         "storage": [
           {
@@ -613,13 +613,13 @@
             "contract": "StrategyAddBaseTokenOnly",
             "label": "factory",
             "type": "t_contract(IUniswapV2Factory)3151",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyAddBaseTokenOnly.sol:20"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyAddBaseTokenOnly.sol:20"
           },
           {
             "contract": "StrategyAddBaseTokenOnly",
             "label": "router",
             "type": "t_contract(IUniswapV2Router02)8678",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyAddBaseTokenOnly.sol:21"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyAddBaseTokenOnly.sol:21"
           }
         ],
         "types": {
@@ -645,8 +645,8 @@
       }
     },
     "bddbc06463634b292ba94b98ff70529d6c3ec452b0e4b519bd23391fc2ad223a": {
-      "address": "0x2df919d3decDDdD20bC5f47C854133bDdB641A4c",
-      "txHash": "0x779b6f62e21ea5d6f578bab7fa41ff611493ea1eb84f8e0fec727ca34c5b7953",
+      "address": "0x78aB9bD7353CA81f684a06471C2D68Be99057b5B",
+      "txHash": "0xe76c4f23504cba11725c8a7501335767c8b217ea6116d7706135af3602d15fc6",
       "layout": {
         "storage": [
           {
@@ -683,19 +683,19 @@
             "contract": "StrategyAddTwoSidesOptimal",
             "label": "factory",
             "type": "t_contract(IUniswapV2Factory)3151",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyAddTwoSidesOptimal.sol:22"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyAddTwoSidesOptimal.sol:22"
           },
           {
             "contract": "StrategyAddTwoSidesOptimal",
             "label": "router",
             "type": "t_contract(IUniswapV2Router02)8678",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyAddTwoSidesOptimal.sol:23"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyAddTwoSidesOptimal.sol:23"
           },
           {
             "contract": "StrategyAddTwoSidesOptimal",
             "label": "vault",
             "type": "t_contract(IVault)11568",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyAddTwoSidesOptimal.sol:24"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyAddTwoSidesOptimal.sol:24"
           }
         ],
         "types": {
@@ -724,8 +724,8 @@
       }
     },
     "16eb2d598a98c1b50ee4e5d1b76001180b1fbfbd5b86f451536394b46b1b2c8f": {
-      "address": "0xaa675dc4500adDc2595E4A7Bc6182320641F8424",
-      "txHash": "0x0ca953534c4138ecf7b6e7eab36f3ebd7c227d866bcff66b9026e8d25d21ca6d",
+      "address": "0x016ffD9AED1bB28beb01756f0b2d0c6c06FF6A39",
+      "txHash": "0xf06de5a4734db88ccb0f6abef4bcb09310c73a8ef9cd0dd403f5f7eb75e9ed60",
       "layout": {
         "storage": [
           {
@@ -762,13 +762,13 @@
             "contract": "StrategyLiquidate",
             "label": "factory",
             "type": "t_contract(IUniswapV2Factory)3151",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyLiquidate.sol:17"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyLiquidate.sol:17"
           },
           {
             "contract": "StrategyLiquidate",
             "label": "router",
             "type": "t_contract(IUniswapV2Router02)8678",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyLiquidate.sol:18"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyLiquidate.sol:18"
           }
         ],
         "types": {
@@ -794,8 +794,8 @@
       }
     },
     "7e7f6b47b25e8cd1cdd270eb6ef5de787c564e0a1b509bb323141430130ff0c8": {
-      "address": "0x6e103627359CADBD61957ADeF3091A5E533B17bC",
-      "txHash": "0x7258aece89303cba459625e2b0178708c567bbeeac5378305596152556248b68",
+      "address": "0x68B8a644b182e430b6464ACedFCc4BC82C6318D9",
+      "txHash": "0xf521783496eec3727945ea3b5d199e7dd2e5745c21261891dfbf24fb595b8d92",
       "layout": {
         "storage": [
           {
@@ -984,8 +984,8 @@
       }
     },
     "3a5d5bec7133abe89788b762ecb89d83a0578355906a5b54745224a94433b313": {
-      "address": "0xd0B264dE48500C64aF415074611e579b0B500818",
-      "txHash": "0xdece867b01bb1db4937afeb2f51577689b0678f3b4e6067c9c824633b0f1c8f2",
+      "address": "0x9c4FEaf8B4a7c6BD778b599e1460f77E2ED42aEd",
+      "txHash": "0x9a3ca6fd69d43f18c7473403b597fb281a19f88210585d481cf980e6b804536a",
       "layout": {
         "storage": [
           {
@@ -1022,13 +1022,13 @@
             "contract": "StrategyWithdrawMinimizeTrading",
             "label": "factory",
             "type": "t_contract(IUniswapV2Factory)3151",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyWithdrawMinimizeTrading.sol:18"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyWithdrawMinimizeTrading.sol:18"
           },
           {
             "contract": "StrategyWithdrawMinimizeTrading",
             "label": "router",
             "type": "t_contract(IUniswapV2Router02)8678",
-            "src": "contracts/6/protocol/strategies/unisushiswap/StrategyWithdrawMinimizeTrading.sol:19"
+            "src": "contracts/6/protocol/strategies/pancakeswap/StrategyWithdrawMinimizeTrading.sol:19"
           }
         ],
         "types": {
@@ -1054,8 +1054,8 @@
       }
     },
     "7f29d4fd64f3656c2c27c15f92ba44e0910ee99be21b0bcbc9fd9c46f4b6044d": {
-      "address": "0xeA726500B6C837e730165c5dB2c8969ca92495Fa",
-      "txHash": "0x06022694cd87f5ebdb6e12f9eaca4f8ef1db15e8478209a0ef87a7a5f9770987",
+      "address": "0xC42D451EF085997Dda75540F56d5a20A53F4B3b0",
+      "txHash": "0xed1ebbd9dca4ba070ed0452d2f5d43d9439c2792a1245e2bbd131c1ada1f212d",
       "layout": {
         "storage": [
           {
@@ -1172,8 +1172,8 @@
       }
     },
     "d7b62848423c8c0885c38c4c3c2e724470e136b5731686ae9a38e21a2cdd088b": {
-      "address": "0xC188254980f4331d29A1a19C2d7E6985178d49ee",
-      "txHash": "0xf68f312d7288eba2cb1cca1e6048d8dfd68e230cb8a01c26ca82c53f4929f6a1",
+      "address": "0x8B5B03Ac8787a2DC47aa0Ec12b0c15D0e3F08273",
+      "txHash": "0xe3f652fdb68ce0a0bdfdff546d176faa7ef0475f9363c8fdf0263b24a384fbd6",
       "layout": {
         "storage": [
           {
@@ -1270,8 +1270,8 @@
       }
     },
     "6c883b146c73b165c5657fe34f9eb19c86870b61d1141bb7bcfe3617158d2576": {
-      "address": "0x7Bb8a92305fd3f3173ECe09fcE918a1bE6d0388E",
-      "txHash": "0x1e8f0db05479f7ce5e9c9c9f879190123fe21ec52e4842775adb001f16d7bb4a",
+      "address": "0xbD7Dc41e9782d3cfB01CCEe81de178F213b46420",
+      "txHash": "0xd283e70ca13db45c93f54f755485f48a92a9a75bea3e6b5533cfd0e41f09dbf5",
       "layout": {
         "storage": [
           {
@@ -1374,7 +1374,7 @@
     }
   },
   "admin": {
-    "address": "0xBc42a249F1244059C625B5c9366c42CA8bb17d29",
-    "txHash": "0x4c9f1f67aed96a3191e05bca73f6ac5729e9a2758f772bec72c28e95f154d704"
+    "address": "0x70E3236808Ef18005f43544Ae9Ff5857772b7126",
+    "txHash": "0xd2b9aae282e93a721c67152ea191e4e3a2335dee3b6c20949efe5b75da8b5cba"
   }
 }
