@@ -1,9 +1,12 @@
 pragma solidity 0.6.6;
 
 import "./AlpacaToken.sol";
+import "./interfaces/IStrongAlpacaRelayer.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
-contract StrongAlpacaRelayer is Ownable {
+contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -30,10 +33,10 @@ contract StrongAlpacaRelayer is Ownable {
     userAddress = _userAddress;
   }
 
-  function transferAllAlpaca() external blockReentrancy onlyOwner {
-    address hodlAddress = msg.sender;
+  function transferAllAlpaca() external override blockReentrancy onlyOwner {
+    address strongAlpacaAddress = msg.sender;
     SafeERC20.safeApprove(alpacaToken, address(this), alpacaToken.balanceOf(address(this)));
     SafeERC20.safeTransferFrom(alpacaToken, address(this), userAddress, alpacaToken.balanceOf(address(this)));
-    alpacaToken.transferAll(hodlAddress);
+    alpacaToken.transferAll(strongAlpacaAddress);
   }
 }

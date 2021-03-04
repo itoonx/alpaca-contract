@@ -9,7 +9,7 @@ import "../utils/SafeToken.sol";
 import "hardhat/console.sol";
 
 // StrongHodl is a smart contract for ALPACA time-locking by asking user to lock ALPACA for a period of time.
-contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Hodl", "STRONG"), Ownable {
+contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownable {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -47,19 +47,17 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Hodl", "STRONG"), Ownable 
     lockEndBlock = _lockEndBlock;
   }
 
-  function prepareHodl() external blockReentrancy {
-    address userAddress = msg.sender;
-    require(_userRelayerMap[userAddress] == address(0), "StrongAlpaca::prepareHodl: user has already prepared hodl");
-    require(block.number < hodlableEndBlock, "StrongAlpaca::hodl: block.number exceeds hodlableEndBlock");
+  function prepareHodl() external override blockReentrancy {
+    require(_userRelayerMap[msg.sender] == address(0), "StrongAlpaca::prepareHodl: user has already prepared hodl");
+    require(block.number < hodlableEndBlock, "StrongAlpaca::prepareHodl: block.number exceeds hodlableEndBlock");
 
     // create relayer contract
-    StrongAlpacaRelayer relayer = new StrongAlpacaRelayer(alpacaTokenAddress, userAddress);
-    _userRelayerMap[userAddress] = address(relayer);
+    StrongAlpacaRelayer relayer = new StrongAlpacaRelayer(alpacaTokenAddress, msg.sender);
+    _userRelayerMap[msg.sender] = address(relayer);
   }
 
   function hodl() external override blockReentrancy {
-    address userAddress = msg.sender;
-    address relayerAddress = _userRelayerMap[userAddress];
+    address relayerAddress = _userRelayerMap[msg.sender];
 
     require(relayerAddress != address(0), "StrongAlpaca::hodl: user has not preapare hodl yet");
     require(block.number < hodlableEndBlock, "StrongAlpaca::hodl: block.number exceeds hodlableEndBlock");
@@ -68,23 +66,30 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Hodl", "STRONG"), Ownable 
     StrongAlpacaRelayer relayer = StrongAlpacaRelayer(relayerAddress);
 
     relayer.transferAllAlpaca();
-    _mint(userAddress, relayerAlpacaLockedBalance);
+    _mint(msg.sender, relayerAlpacaLockedBalance);
   }
 
-  function noHodl() external override blockReentrancy {
+  function unhodl() external override blockReentrancy {
     require(block.number > lockEndBlock, "StrongAlpaca::noHodl: block.number have not reach lockEndBlock");
-    address userAddress = msg.sender;
-    uint256 userHodlBalance = balanceOf(userAddress);
+    require(
+      block.number > alpacaToken.endReleaseBlock(),
+      "StrongAlpaca::noHodl: block.number have not reach alpacaToken.endReleaseBlock"
+    );
 
     // unlock all the Alpaca token in case it never have been unlocked yet
+    // Note: given that releasePeriodEnd has passed, so that locked token has been 100% released
     if (alpacaToken.lockOf(address(this)) > 0) {
       alpacaToken.unlock();
     }
 
-    // user transfer hodl to hodl
-    SafeERC20.safeTransferFrom(this, userAddress, address(this), userHodlBalance);
-    // transfer Alpaca from hodl to user
-    SafeERC20.safeTransferFrom(alpacaToken, address(this), userAddress, userHodlBalance);
+    uint256 userStrongAlpacaBalance = balanceOf(msg.sender);
+    // Note: user must approve this contract to move Strong Alpaca token to its address
+    // user transfer Strong Alpaca back
+    SafeERC20.safeTransferFrom(this, msg.sender, address(this), userStrongAlpacaBalance);
+
+    // transfer Alpaca from Strong Alpaca to user
+    SafeERC20.safeApprove(alpacaToken, address(this), userStrongAlpacaBalance);
+    SafeERC20.safeTransferFrom(alpacaToken, address(this), msg.sender, userStrongAlpacaBalance);
   }
 
   function getRelayerAddress(address _account) public view returns (address) {
