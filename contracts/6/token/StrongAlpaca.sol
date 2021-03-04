@@ -70,11 +70,11 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownab
   }
 
   function unhodl() external override blockReentrancy {
-    require(block.number > lockEndBlock, "StrongAlpaca::noHodl: block.number have not reach lockEndBlock");
     require(
       block.number > alpacaToken.endReleaseBlock(),
-      "StrongAlpaca::noHodl: block.number have not reach alpacaToken.endReleaseBlock"
+      "StrongAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock"
     );
+    require(block.number > lockEndBlock, "StrongAlpaca::unhodl: block.number have not reach lockEndBlock");
 
     // unlock all the Alpaca token in case it never have been unlocked yet
     // Note: given that releasePeriodEnd has passed, so that locked token has been 100% released

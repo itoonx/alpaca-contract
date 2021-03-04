@@ -151,7 +151,7 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       await TimeHelpers.advanceBlockTo(nowBlock + 100)
       await expect(strongAlpacaAsAlice.prepareHodl())
         .to.be
-        .revertedWith('StrongAlpaca::hodl: block.number exceeds hodlableEndBlock')
+        .revertedWith('StrongAlpaca::prepareHodl: block.number exceeds hodlableEndBlock')
     })
   })
 
@@ -182,7 +182,7 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
   })
 
   context('when alice and bob wants to unhodl', async() => {
-    it('should swap Strong Alpaca with Alpaca successfully', async () => {
+    it('should swap Strong Alpaca with Alpaca successfully after doing hodl properly', async () => {
       const aliceAddress = await alice.getAddress()
       const bobAddress = await bob.getAddress()
 
@@ -238,5 +238,20 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await strongAlpaca.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
     })
+
+    it('should not allow to do so before alpacaToken.endReleaseBlock', async () => {
+      await expect(strongAlpacaAsAlice.unhodl())
+        .to.be
+        .revertedWith('StrongAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock')
+    })
+
+    it('should not allow to do so before lockEndBlock', async () => {
+      // fast forward to alpacaToken.endReleaseBlock
+      await TimeHelpers.advanceBlockTo(nowBlock + 300)
+      await expect(strongAlpacaAsAlice.unhodl())
+        .to.be
+        .revertedWith('StrongAlpaca::unhodl: block.number have not reach lockEndBlock')
+    })
+
   })
 })
