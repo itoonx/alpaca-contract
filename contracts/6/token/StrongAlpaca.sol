@@ -26,6 +26,11 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownab
   // To track the portion of each user Alpaca
   mapping(address => address) private _userRelayerMap;
 
+  // events
+  event PrepareHodl(address indexed user, address indexed relayer);
+  event Hodl(address indexed user, address indexed relayer, uint256 receivingStrongAlpacaAmount);
+  event Unhodl(address indexed user, uint256 receivingAlpacaAmount);
+
   bool internal locked; //only contract can change this variable
   modifier blockReentrancy {
     require(!locked, "Contract is locked");
@@ -54,6 +59,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownab
     // create relayer contract
     StrongAlpacaRelayer relayer = new StrongAlpacaRelayer(alpacaTokenAddress, msg.sender);
     _userRelayerMap[msg.sender] = address(relayer);
+    emit PrepareHodl(msg.sender, address(relayer));
   }
 
   function hodl() external override blockReentrancy {
@@ -67,6 +73,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownab
 
     relayer.transferAllAlpaca();
     _mint(msg.sender, relayerAlpacaLockedBalance);
+    emit Hodl(msg.sender, address(relayer), relayerAlpacaLockedBalance);
   }
 
   function unhodl() external override blockReentrancy {
@@ -90,6 +97,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Strong Alpaca", "STRONCA"), Ownab
     // transfer Alpaca from Strong Alpaca to user
     SafeERC20.safeApprove(alpacaToken, address(this), userStrongAlpacaBalance);
     SafeERC20.safeTransferFrom(alpacaToken, address(this), msg.sender, userStrongAlpacaBalance);
+    emit Unhodl(msg.sender, userStrongAlpacaBalance);
   }
 
   function getRelayerAddress(address _account) public view returns (address) {

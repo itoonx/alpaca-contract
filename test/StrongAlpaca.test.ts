@@ -75,13 +75,15 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
 
       // Alice prepare hodl
       expect(await strongAlpaca.getRelayerAddress(aliceAddress)).to.equal(ADDRESS0)
-      await strongAlpacaAsAlice.prepareHodl()
+      await expect(strongAlpacaAsAlice.prepareHodl())
+        .to.emit(strongAlpacaAsAlice, 'PrepareHodl')
       const aliceRelayerAddress = await strongAlpaca.getRelayerAddress(aliceAddress)
       expect(aliceRelayerAddress).to.not.equal(ADDRESS0)
 
       // Bob prepare hodl
       expect(await strongAlpaca.getRelayerAddress(bobAddress)).to.equal(ADDRESS0)
-      await strongAlpacaAsBob.prepareHodl()
+      await expect(strongAlpacaAsBob.prepareHodl())
+        .to.emit(strongAlpacaAsBob, 'PrepareHodl')
       const bobRelayerAddress = await strongAlpaca.getRelayerAddress(bobAddress)
       expect(bobRelayerAddress).to.not.equal(ADDRESS0)
 
@@ -113,7 +115,9 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       // Alice hodl!
       expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      await strongAlpacaAsAlice.hodl()
+      await expect(strongAlpacaAsAlice.hodl())
+        .to.emit(strongAlpacaAsAlice, 'Hodl')
+        .withArgs(aliceAddress, aliceRelayerAddress, ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(aliceRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
@@ -123,7 +127,9 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
 
       // Bob hodl!
-      await strongAlpacaAsBob.hodl()
+      await expect(strongAlpacaAsBob.hodl())
+        .to.emit(strongAlpacaAsBob, 'Hodl')
+        .withArgs(bobAddress, bobRelayerAddress, ethers.utils.parseEther('50'))
       expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
       expect(await alpacaToken.balanceOf(bobRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
@@ -216,7 +222,9 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('20'))
       await strongAlpacaAsAlice.approve(strongAlpacaAsAlice.address, ethers.constants.MaxUint256)
-      await strongAlpacaAsAlice.unhodl()
+      await expect(strongAlpacaAsAlice.unhodl())
+        .to.emit(strongAlpacaAsAlice, 'Unhodl')
+        .withArgs(aliceAddress, ethers.utils.parseEther('100'))
       expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('120'))
 
@@ -228,8 +236,10 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       // bob unhodl
       expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
-      await strongAlpacaAsBob.approve(strongAlpacaAsAlice.address, ethers.constants.MaxUint256)
-      await strongAlpacaAsBob.unhodl()
+      await strongAlpacaAsBob.approve(strongAlpacaAsBob.address, ethers.constants.MaxUint256)
+      await expect(strongAlpacaAsBob.unhodl())
+        .to.emit(strongAlpacaAsBob, 'Unhodl')
+        .withArgs(bobAddress, ethers.utils.parseEther('50'))
       expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
 
