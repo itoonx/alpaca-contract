@@ -15,6 +15,7 @@ import {
   LinearRelease,
   LinearRelease__factory
 } from "../typechain";
+import * as TimeHelpers from "./helpers/time"
 
 chai.use(solidity);
 const { expect } = chai;
@@ -97,13 +98,7 @@ describe("FairLaunchV2", () => {
 
     // Create fairLaunchLink token
     fairLaunchLink = await upgrades.deployProxy(MockERC20, ['fairLaunchLink', 'fairLaunchLink']) as MockERC20
-    await fairLaunchLink.deployed()
-
-    // add dummyToken to fairLaunchV1
-    fairLaunch.addPool(100, fairLaunchLink.address, false)
-
-    // mint fairLaunchLink token for deployer
-    await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+    await fairLaunchLink.deployed();
 
     // Deploy FairLaunchV2
     const FairLaunchV2 = (await ethers.getContractFactory(
@@ -111,13 +106,9 @@ describe("FairLaunchV2", () => {
       deployer
     )) as FairLaunchV2__factory;
     fairLaunchV2 = await FairLaunchV2.deploy(
-      fairLaunch.address, alpacaToken.address, 0
+      fairLaunch.address, alpacaToken.address, 1
     )
     await fairLaunch.deployed();
-
-    // Initialized fairLaunchV2
-    await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
-    await fairLaunchV2.init(fairLaunchLink.address);
 
     alpacaTokenAsAlice = AlpacaToken__factory.connect(alpacaToken.address, alice);
     alpacaTokenAsBob = AlpacaToken__factory.connect(alpacaToken.address, bob);
@@ -147,50 +138,96 @@ describe("FairLaunchV2", () => {
 
   context('when already init', async() => {
     it('should work', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       expect(await fairLaunchLink.balanceOf(await deployer.getAddress())).to.be.eq('0');
     })
   })
 
   context('when adjust params', async() => {
     it('should add new pool', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       for(let i = 0; i < stakingTokens.length; i++) {
-        await fairLaunchV2.addPool(1, stakingTokens[i].address, ADDRESS0,
-          { from: (await deployer.getAddress()) } as Overrides)
+        await fairLaunchV2.addPool(1, stakingTokens[i].address, ADDRESS0, 0)
       }
       expect(await fairLaunchV2.poolLength()).to.eq(stakingTokens.length);
     });
 
     it('should revert when the stakeToken is already added to the pool', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       for(let i = 0; i < stakingTokens.length; i++) {
-        await fairLaunchV2.addPool(1, stakingTokens[i].address, ADDRESS0,
-          { from: (await deployer.getAddress()) } as Overrides)
+        await fairLaunchV2.addPool(1, stakingTokens[i].address, ADDRESS0, 0)
       }
       expect(await fairLaunchV2.poolLength()).to.eq(stakingTokens.length);
 
-      await expect(fairLaunchV2.addPool(1, stakingTokens[0].address, ADDRESS0,
-          { from: (await deployer.getAddress()) } as Overrides)).to.be.revertedWith("add: stakeToken dup");
+      await expect(fairLaunchV2.addPool(1, stakingTokens[0].address, ADDRESS0, 0))
+        .to.be.revertedWith("add: stakeToken dup");
     });
   });
 
   context('when use pool', async() => {
-    // it('should revert when there is nothing to be harvested', async() => {
-    //   await fairLaunch.addPool(1, stakingTokens[0].address.toString(), false,
-    //     { from: (await deployer.getAddress()) } as Overrides);
-    //   await expect(fairLaunch.harvest(0,
-    //     { from: (await deployer.getAddress()) } as Overrides)).to.be.revertedWith("nothing to harvest");
-    // });
-
     it('should revert when that pool is not existed', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       await expect(fairLaunchV2.deposit((await deployer.getAddress()), 88, ethers.utils.parseEther('100'),
         { from: (await deployer.getAddress()) } as Overrides)).to.be.reverted;
     });
 
     it('should revert when withdrawer is not a funder', async () => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
 
       // 2. Add STOKEN0 to the fairLaunch pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -202,11 +239,22 @@ describe("FairLaunchV2", () => {
     });
 
     it('should allow deposit when funder withdrew funds and owner want to stake his own token', async () => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
 
       // 2. Add STOKEN0 to the fairLaunch pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -230,12 +278,23 @@ describe("FairLaunchV2", () => {
     });
 
     it('should revert when 2 accounts try to fund the same user', async () => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
       await stoken0AsDeployer.mint((await dev.getAddress()), ethers.utils.parseEther('100'));
 
       // 2. Add STOKEN0 to the fairLaunch pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -248,11 +307,22 @@ describe("FairLaunchV2", () => {
     });
 
     it('should harvest yield from the position opened by funder', async () => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
 
       // 2. Add STOKEN0 to the fairLaunch pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -268,13 +338,24 @@ describe("FairLaunchV2", () => {
     });
 
     it('should distribute rewards according to the alloc point', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 and STOKEN1 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('100'));
       await stoken1AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('50'));
 
       // 2. Add STOKEN0 to the fairLaunch pool
-      await fairLaunchV2AsDeployer.addPool(50, stakingTokens[0].address, ADDRESS0);
-      await fairLaunchV2AsDeployer.addPool(50, stakingTokens[1].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(50, stakingTokens[0].address, ADDRESS0, 0);
+      await fairLaunchV2AsDeployer.addPool(50, stakingTokens[1].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -302,12 +383,23 @@ describe("FairLaunchV2", () => {
     })
 
     it('should work', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
       await stoken0AsDeployer.mint((await bob.getAddress()), ethers.utils.parseEther('100'));
 
       // 2. Add STOKEN0 to the fairLaunchV2 pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, 0);
 
       // 3. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -406,22 +498,35 @@ describe("FairLaunchV2", () => {
     });
 
     it('should work when there is a locker', async() => {
+      // add dummyToken to fairLaunchV1
+      await fairLaunch.addPool(0, stakingTokens[0].address, false);
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+
+      // mint fairLaunchLink token for deployer
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+
+      // Initialized fairLaunchV2
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+      await fairLaunchV2.init(fairLaunchLink.address);
+
       // 1. Mint STOKEN0 for staking
       await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
       await stoken0AsDeployer.mint((await bob.getAddress()), ethers.utils.parseEther('100'));
 
       // 2. Deploy LinearRelease Locker
+      const startReleaseBlock = (await TimeHelpers.latestBlockNumber()).add(12)
+      const endReleaseBlock = startReleaseBlock.add(5);
       const LinearRelease = (await ethers.getContractFactory(
         'LinearRelease', deployer
       )) as LinearRelease__factory
       const linearRelease = await LinearRelease.deploy(
-        alpacaToken.address, '7000', fairLaunchV2.address, '220', '225') as LinearRelease
+        alpacaToken.address, '7000', fairLaunchV2.address, startReleaseBlock, endReleaseBlock) as LinearRelease
 
       const linearReleaseAsAlice = LinearRelease__factory.connect(linearRelease.address, alice);
       const linearReleaseAsBob = LinearRelease__factory.connect(linearRelease.address, bob);
 
       // 3. Add STOKEN0 to the fairLaunchV2 pool
-      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, linearRelease.address);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, linearRelease.address, 0);
 
       // 4. Deposit STOKEN0 to the STOKEN0 pool
       await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
@@ -528,4 +633,111 @@ describe("FairLaunchV2", () => {
       expect(await alpacaToken.balanceOf((await bob.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('7500'));
     });
   });
+
+  context('when migrate from FLV1 to FLV2', async() => {
+    it('should migrate successfully', async() => {
+      // 1. Mint STOKEN0 for staking
+      await stoken0AsDeployer.mint((await alice.getAddress()), ethers.utils.parseEther('400'));
+      await stoken0AsDeployer.mint((await bob.getAddress()), ethers.utils.parseEther('100'));
+
+      // 2. Add STOKEN0 to the fairLaunch pool
+      await fairLaunchAsDeployer.addPool(1, stakingTokens[0].address, false);
+
+      // 3. Alice deposit STOKEN0 to the STOKEN0 pool
+      await stoken0AsAlice.approve(fairLaunch.address, ethers.utils.parseEther('100'));
+      await fairLaunchAsAlice.deposit((await alice.getAddress()), 0, ethers.utils.parseEther('100'));
+
+      // 4. Trigger random update pool to make 1 more block mine
+      await fairLaunch.massUpdatePools();
+
+      // 5. Check pendingAlpaca for Alice
+      expect(await fairLaunch.pendingAlpaca(0, (await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('5000'));
+
+      // 6. Trigger random update pool to make 1 more block mine
+      await fairLaunch.massUpdatePools();
+
+      // 7. Check pendingAlpaca for Alice
+      expect(await fairLaunch.pendingAlpaca(0, (await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('10000'));
+
+      // 8. Alice should get 15,000 ALPACAs when she harvest
+      // also check that dev got his tax
+      // PS. Dev get 1,500 = as 10% as Alice
+      await fairLaunchAsAlice.harvest(0);
+      expect(await alpacaToken.balanceOf((await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('15000'));
+      expect(await alpacaToken.balanceOf((await dev.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('1500'));
+
+      // 9. Bob come in and join the party
+      // 2 blocks are mined here, hence Alice should get 10,000 ALPACAs more (2x5,000)
+      await stoken0AsBob.approve(fairLaunch.address, ethers.utils.parseEther('100'));
+      await fairLaunchAsBob.deposit((await bob.getAddress()), 0, ethers.utils.parseEther('100'));
+
+      expect(await fairLaunch.pendingAlpaca(0, (await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('10000'));
+      expect(await alpacaToken.balanceOf((await dev.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('2500'));
+
+      // 10. Trigger random update pool to make 1 more block mine
+      await fairLaunch.massUpdatePools();
+
+      // 11. Start to migrate FLV1 to FLV2
+      // add Link pool to FLV1 first, then turn off all pools on FLV1
+      await fairLaunch.addPool(1, fairLaunchLink.address, false);
+      await fairLaunch.setPool(0, 0, false);
+
+      // 12. Alice & Bob exit FLV1
+      // Alice +10,000+2,500
+      // Bob +2,500
+      await fairLaunchAsAlice.withdraw(await alice.getAddress(), 0, ethers.utils.parseEther('100'));
+      await fairLaunchAsBob.withdraw(await bob.getAddress(), 0, ethers.utils.parseEther('100'));
+      expect(await alpacaToken.balanceOf(await alice.getAddress())).to.be.bignumber.eq(ethers.utils.parseEther('27500'));
+      expect(await alpacaToken.balanceOf(await bob.getAddress())).to.be.bignumber.eq(ethers.utils.parseEther('2500'));
+      expect(await alpacaToken.balanceOf((await dev.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('3000'));
+
+      // 13. Initialized fairLaunchV2
+      await fairLaunchLink.mint(await deployer.getAddress(), ethers.utils.parseEther('1'));
+      await fairLaunchLink.approve(fairLaunchV2.address, ethers.utils.parseEther('1'));
+
+      // 14. Add STOKEN0 to the fairLaunchV2 pool
+      // start at blockNumber + 5 as we want to make sure that Alice & Bob have time to onboard
+      const startBlock = (await TimeHelpers.latestBlockNumber()).add(6);
+      await fairLaunchV2AsDeployer.addPool(1, stakingTokens[0].address, ADDRESS0, startBlock);
+
+      // 15. Alice & Bob deposit STOKEN0 to the STOKEN0 pool
+      await stoken0AsAlice.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
+      await fairLaunchV2AsAlice.deposit((await alice.getAddress()), 0, ethers.utils.parseEther('100'));
+      await stoken0AsBob.approve(fairLaunchV2.address, ethers.utils.parseEther('100'));
+      await fairLaunchV2AsBob.deposit(await bob.getAddress(), 0, ethers.utils.parseEther('100'));
+
+      // 16. Trigger random update pool to make 1 more block mine
+      await fairLaunchV2.massUpdatePools([0]);
+
+      // 17. Check pendingAlpaca for Alice & Bob. Expected to be 0 as pool has no allocPoint yet
+      // expect dev token to be the same amount as no alpaca has been mint
+      expect(await fairLaunchV2.pendingAlpaca(0, await alice.getAddress())).to.be.bignumber.eq(ethers.utils.parseEther('0'));
+      expect(await fairLaunchV2.pendingAlpaca(0, await alice.getAddress())).to.be.bignumber.eq(ethers.utils.parseEther('0'));
+      expect(await alpacaToken.balanceOf(await dev.getAddress())).to.be.bignumber.eq(ethers.utils.parseEther('3000'));
+
+      await fairLaunchV2.init(fairLaunchLink.address);
+
+      // 18. Set allocPoint to 1 to continue mintting ALPACAs
+      // Rewards kick-in here
+      await fairLaunch.setPool(1, 1, false);
+
+      // 19. Trigger random update pool to make 1 more block mine
+      await fairLaunchV2AsAlice.massUpdatePools([0]);
+
+      console.log(await alpacaToken.balanceOf(fairLaunchV2.address))
+
+      // 20. Now Alice and Bob should get some ALPACAs
+      // Check pendingAlpaca for Alice & Bob
+      expect(await fairLaunchV2.pendingAlpaca(0, (await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('7500'));
+      expect(await fairLaunchV2.pendingAlpaca(0, (await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('7500'));
+      expect(await alpacaToken.balanceOf((await dev.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('4000'));
+
+      // 21. Alice should get 5,000 ALPACAs when she harvest
+      // also check that dev got his tax
+      // PS. Dev get 5,500 as mining continue 2 blocks earlier
+      await fairLaunchV2AsAlice.harvest(0);
+      expect(await alpacaToken.balanceOf((await alice.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('37500'));
+      expect(await alpacaToken.balanceOf((await dev.getAddress()))).to.be.bignumber.eq(ethers.utils.parseEther('4500'));
+    })
+  })
 });

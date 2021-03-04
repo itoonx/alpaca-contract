@@ -20,6 +20,7 @@ interface IFairLaunchV1 {
   function alpacaPerBlock() external view returns (uint256);
   function totalAllocPoint() external view returns (uint256);
   function poolInfo(uint256 pid) external view returns (IFairLaunchV1.PoolInfo memory);
+  function userInfo(uint256 pid, address user) external view returns (IFairLaunchV1.UserInfo memory);
 
   function poolLength() external view returns (uint256);
 

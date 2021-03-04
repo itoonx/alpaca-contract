@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./interfaces/IFairLaunchV1.sol";
 import "./interfaces/ILocker.sol";
 
+import "hardhat/console.sol";
+
 /// @notice The (older) FairLaunch contract lock and vest machanic embeded in AlpacaToken
 /// Hence to make the protocol to be able to adjust those lock and vest machanic we need FairLaunchV2
 /// However, FairLaunch is the only owner with the right to mint AlpacaToken,
@@ -46,6 +48,8 @@ contract FairLaunchV2 is Ownable {
   IERC20[] public stakeTokens;
   /// @notice Address of each `ILockers` contract.
   ILocker[] public lockers;
+  /// @notice DummyToken
+  IERC20 public dummyToken;
 
   /// @notice Info of each user that stakes tokens.
   mapping (uint256 => mapping (address => UserInfo)) public userInfo;
@@ -83,9 +87,9 @@ contract FairLaunchV2 is Ownable {
   /// @notice Deposits a dummy tokens to `FAIR_LAUNCH`.
   /// This is required because `FAIR_LAUNCH` holds the minting rights for ALPACA.
   /// Any balance of transaction sender from `dummyToken` is transferred.
-  function init(IERC20 dummyToken) external {
+  function init(IERC20 _dummyToken) public onlyOwner {
+    dummyToken = _dummyToken;
     uint256 balance = dummyToken.balanceOf(msg.sender);
-    require(balance != 0, "Balance must exceed 0");
     dummyToken.safeTransferFrom(msg.sender, address(this), balance);
     dummyToken.approve(address(FAIR_LAUNCH_V1), balance);
     FAIR_LAUNCH_V1.deposit(address(this), MASTER_PID, balance);
@@ -106,15 +110,24 @@ contract FairLaunchV2 is Ownable {
     return false;
   }
 
+  /// @notice Withdraw dummyToken from FLV1. This will make FLV1 stop mintting ALPACA
+  /// This function is needed if we need FLV3.
+  function withdrawMasterPool(address to) public onlyOwner {
+    require(totalAllocPoint == 0, "withdrawMasterPool: totalAllocPoint not zero");
+    FAIR_LAUNCH_V1.withdraw(
+      address(this), MASTER_PID, FAIR_LAUNCH_V1.userInfo(MASTER_PID, address(this)).amount);
+    dummyToken.safeTransfer(to, dummyToken.balanceOf(address(this)));
+  }
+
   /// @notice Add a new lp to the pool. Can only be called by the owner.
   /// DO NOT add the same LP token more than once. Rewards will be messed up if you do.
   /// @param allocPoint AP of the new pool
   /// @param _stakeToken address of the LP token
   /// @param _locker address of the reward Contract
-  function addPool(uint256 allocPoint, IERC20 _stakeToken, ILocker _locker) public onlyOwner {
+  function addPool(uint256 allocPoint, IERC20 _stakeToken, ILocker _locker, uint256 _startBlock) public onlyOwner {
     require(!isDuplicatedPool(_stakeToken), "add: stakeToken dup");
 
-    uint256 lastRewardBlock = block.number;
+    uint256 lastRewardBlock = block.number > _startBlock ? block.number : _startBlock;
     totalAllocPoint = totalAllocPoint.add(allocPoint);
 
     stakeTokens.push(_stakeToken);
@@ -173,7 +186,6 @@ contract FairLaunchV2 is Ownable {
       .mul(FAIR_LAUNCH_V1.poolInfo(MASTER_PID).allocPoint) / FAIR_LAUNCH_V1.totalAllocPoint();
   }
 
-
   /// @notice Update reward variables of the given pool.
   /// @param pid The index of the pool. See `poolInfo`.
   /// @return pool returns the Pool that was updated
@@ -181,7 +193,7 @@ contract FairLaunchV2 is Ownable {
     pool = poolInfo[pid];
     if (block.number > pool.lastRewardBlock) {
       uint256 stakeTokenSupply = stakeTokens[pid].balanceOf(address(this));
-      if (stakeTokenSupply > 0) {
+      if (stakeTokenSupply > 0 && totalAllocPoint > 0) {
         uint256 blocks = block.number.sub(pool.lastRewardBlock);
         uint256 alpacaReward = blocks.mul(alpacaPerBlock()).mul(pool.allocPoint) / totalAllocPoint;
         pool.accAlpacaPerShare = pool.accAlpacaPerShare.add((alpacaReward.mul(ACC_ALPACA_PRECISION) / stakeTokenSupply));

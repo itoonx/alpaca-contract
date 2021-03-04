@@ -308,7 +308,7 @@ contract Vault is IVault, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe, OwnableU
       if (token == config.getWrappedNativeAddr()) {
         SafeToken.safeTransfer(token, config.getWNativeRelayer(), prize);
         WNativeRelayer(uint160(config.getWNativeRelayer())).withdraw(prize);
-        msg.sender.transfer(prize);
+        SafeToken.safeTransferETH(msg.sender, prize);
       } else {
         SafeToken.safeTransfer(token, msg.sender, prize);
       }
@@ -318,7 +318,7 @@ contract Vault is IVault, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe, OwnableU
       if (token == config.getWrappedNativeAddr()) {
         SafeToken.safeTransfer(token, config.getWNativeRelayer(), left);
         WNativeRelayer(uint160(config.getWNativeRelayer())).withdraw(left);
-        msg.sender.transfer(left);
+        SafeToken.safeTransferETH(pos.owner, left);
       } else {
         SafeToken.safeTransfer(token, pos.owner, left);
       }
