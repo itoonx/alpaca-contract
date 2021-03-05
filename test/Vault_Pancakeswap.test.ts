@@ -1339,4 +1339,203 @@ describe('Vault - Pancake', () => {
     expect(bobAfter).to.be.bignumber.gt(bobBefore);
     expect(bobAlpacaAfter).to.be.bignumber.gt(bobAlpacaBefore);
   }).timeout(50000)
+
+  it('should close position correctly when user holds mix positions of leveraged and non-leveraged', async () => {
+    // Set Bank's debt interests to 0% per year
+    await simpleVaultConfig.setParams(
+      ethers.utils.parseEther('1'), // 1 BTOKEN min debt size,
+      '0', // 0% per year
+      '1000', // 10% reserve pool
+      '1000', // 10% Kill prize
+      wbnb.address,
+      wNativeRelayer.address,
+      fairLaunch.address,
+    );
+
+    // Set Reinvest bounty to 10% of the reward
+    await pancakeswapWorker.setReinvestBountyBps('1000');
+
+    // Bob deposits 10 BTOKEN
+    await baseTokenAsBob.approve(vault.address, ethers.utils.parseEther('10'));
+    await vaultAsBob.deposit(ethers.utils.parseEther('10'));
+
+    // Alice deposits 12 BTOKEN
+    await baseTokenAsAlice.approve(vault.address, ethers.utils.parseEther('12'));
+    await vaultAsAlice.deposit(ethers.utils.parseEther('12'));
+
+    // Position#1: Bob borrows 10 BTOKEN loan
+    await baseTokenAsBob.approve(vault.address, ethers.utils.parseEther('10'))
+    await vaultAsBob.work(
+      0,
+      pancakeswapWorker.address,
+      ethers.utils.parseEther('10'),
+      ethers.utils.parseEther('10'),
+      '0', // max return = 0, don't return NATIVE to the debt
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'bytes'],
+        [addStrat.address, ethers.utils.defaultAbiCoder.encode(
+          ['address', 'address', 'uint256'],
+          [baseToken.address, quoteToken.address, '0'])
+        ]
+      ),
+    );
+
+    // Position#2: Bob open position without leverage
+    await baseTokenAsBob.approve(vault.address, ethers.utils.parseEther('3'))
+    await vaultAsBob.work(
+      0,
+      pancakeswapWorker.address,
+      ethers.utils.parseEther('3'),
+      '0',
+      '0', // max return = 0, don't return BTOKEN to the debt
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'bytes'],
+        [addStrat.address, ethers.utils.defaultAbiCoder.encode(
+          ['address','address', 'uint256'],
+          [baseToken.address, quoteToken.address, '0'])
+        ]
+      )
+    );
+
+    // ---------------- Reinvest#1 -------------------
+    // Wait for 1 day and someone calls reinvest
+    await TimeHelpers.increase(TimeHelpers.duration.days(ethers.BigNumber.from('1')));
+
+    let [workerLPBefore, workerDebtBefore] = await masterChef.userInfo(poolId, pancakeswapWorker.address);
+    await pancakeswapWorkerAsEve.reinvest();
+    // PancakeWorker receives 303999999998816250 cake as a reward
+    // Eve got 10% of 303999999998816250 cake = 0.1 * 303999999998816250 = 30399999999881625 bounty
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('0.030399999999881625').toString(),
+      (await cake.balanceOf(await eve.getAddress())).toString(),
+    );
+
+    // Remaining PancakeWorker reward = 227999999998874730 - 22799999999887473 = 205199999998987257 (~90% reward)
+    // Convert 205199999998987257 cake to 671683776318381694 NATIVE
+    // Convert NATIVE to 1252466339860712438 LP token and stake
+    let [workerLPAfter, workerDebtAfter] = await masterChef.userInfo(poolId, pancakeswapWorker.address);
+
+    // LP tokens of worker should be inceased from reinvestment
+    expect(workerLPAfter).to.be.bignumber.gt(workerLPBefore);
+
+    // Check Position#1 info
+    await pancakeswapWorker.health('1');
+    let [bob1Health, bob1DebtToShare] = await vault.positionInfo('1');
+    expect(bob1Health).to.be.bignumber.gt(ethers.utils.parseEther('20')); // Get Reward and increase health
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('10').toString(),
+      bob1DebtToShare.toString(),
+    );
+
+    // Check Position#2 info
+    await pancakeswapWorker.health('2');
+    let [bob2Health, bob2DebtToShare] = await vault.positionInfo('2');
+    expect(bob2Health).to.be.bignumber.gt(ethers.utils.parseEther('3')); // Get Reward and increase health
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('0').toString(),
+      bob2DebtToShare.toString(),
+    );
+
+    // ---------------- Reinvest#2 -------------------
+    // Wait for 1 day and someone calls reinvest
+    await TimeHelpers.increase(TimeHelpers.duration.days(ethers.BigNumber.from('1')));
+
+    [workerLPBefore, workerDebtBefore] = await masterChef.userInfo(poolId, pancakeswapWorker.address);
+    await pancakeswapWorker.reinvest();
+
+    // eve should earn cake as a reward for reinvest
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('0.045599999999876608').toString(),
+      (await cake.balanceOf(await eve.getAddress())).toString(),
+    );
+
+    // Remaining Worker reward = 142858796296283038 - 14285879629628304 = 128572916666654734 (~90% reward)
+    // Convert 128572916666654734 uni to 157462478899282341 NATIVE
+    // Convert NATIVE to 5001669421841640 LP token
+    [workerLPAfter, workerDebtAfter] = await masterChef.userInfo(poolId, pancakeswapWorker.address);
+    // LP tokens of worker should be inceased from reinvestment
+    expect(workerLPAfter).to.be.bignumber.gt(workerLPBefore);
+
+    // Check Position#1 position info
+    [bob1Health, bob1DebtToShare] = await vault.positionInfo('1');
+    expect(bob1Health).to.be.bignumber.gt(ethers.utils.parseEther('20')); // Get Reward and increase health
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('10').toString(),
+      bob1DebtToShare.toString(),
+    );
+
+    // Check Position#2 position info
+    [bob2Health, bob2DebtToShare] = await vault.positionInfo('2');
+    expect(bob2Health).to.be.bignumber.gt(ethers.utils.parseEther('3')); // Get Reward and increase health
+    AssertHelpers.assertAlmostEqual(
+      ethers.utils.parseEther('0').toString(),
+      bob2DebtToShare.toString(),
+    );
+
+    let bobBefore = await baseToken.balanceOf(await bob.getAddress());
+    let bobAlpacaBefore = await alpacaToken.balanceOf(await bob.getAddress());
+    // Bob close position#1
+    await vaultAsBob.work(
+      1,
+      pancakeswapWorker.address,
+      '0',
+      '0',
+      '1000000000000000000000',
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'bytes'],
+        [liqStrat.address, ethers.utils.defaultAbiCoder.encode(
+          ['address', 'address', 'uint256'],
+          [baseToken.address, quoteToken.address, '0'])
+        ]
+      )
+    );
+    let bobAfter = await baseToken.balanceOf(await bob.getAddress());
+    let bobAlpacaAfter = await alpacaToken.balanceOf(await bob.getAddress());
+
+    // Check Bob account, Bob must be richer as he earn more from yield
+    expect(bobAlpacaAfter).to.be.bignumber.gt(bobAlpacaBefore);
+    expect(bobAfter).to.be.bignumber.gt(bobBefore);
+
+    // Bob add another 10 BTOKEN
+    await baseTokenAsBob.approve(vault.address, ethers.utils.parseEther('10'));
+    await vaultAsBob.work(
+      2,
+      pancakeswapWorker.address,
+      ethers.utils.parseEther('10'),
+      0,
+      '0', // max return = 0, don't return NATIVE to the debt
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'bytes'],
+        [addStrat.address, ethers.utils.defaultAbiCoder.encode(
+          ['address','address', 'uint256'],
+          [baseToken.address, quoteToken.address, '0'])
+        ]
+      )
+    );
+
+    bobBefore = await baseToken.balanceOf(await bob.getAddress());
+    bobAlpacaBefore = await alpacaToken.balanceOf(await bob.getAddress());
+    // Bob close position#2
+    await vaultAsBob.work(
+      2,
+      pancakeswapWorker.address,
+      '0',
+      '0',
+      '1000000000000000000000000000000',
+      ethers.utils.defaultAbiCoder.encode(
+        ['address', 'bytes'],
+        [liqStrat.address, ethers.utils.defaultAbiCoder.encode(
+          ['address', 'address', 'uint256'],
+          [baseToken.address, quoteToken.address, '0'])
+        ]
+      ),
+    );
+    bobAfter = await baseToken.balanceOf(await bob.getAddress());
+    bobAlpacaAfter = await alpacaToken.balanceOf(await bob.getAddress());
+
+    // Check Bob account, Bob must be richer as she earned from leverage yield farm without getting liquidated
+    // But bob shouldn't earn more ALPACAs from closing position#2
+    expect(bobAfter).to.be.bignumber.gt(bobBefore);
+    expect(bobAlpacaAfter).to.be.bignumber.eq(bobAlpacaBefore);
+  }).timeout(50000)
 });
