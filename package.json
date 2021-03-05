@@ -42,6 +42,7 @@
     "deploy:testnet:s006": "hardhat --network testnet deploy --no-compile --reset --tags UpgradeFairLaunch",
     "mainnet": "hardhat console --no-compile --network mainnet",
     "test:fairlaunch": "hardhat test --no-compile ./test/FairLaunch.test.ts",
+    "test:fairlaunchv2": "hardhat test --no-compile ./test/FairLaunchV2.test.ts",
     "test:pancake": "hardhat test --no-compile ./test/Vault_Pancakeswap.test.ts",
     "test:uniadd": "hardhat test --no-compile ./test/Unisushiswap_StrategyAddBaseTokenOnly.test.ts",
     "test:uniliquidate": "hardhat test --no-compile ./test/Unisushiswap_StrategyLiquidate.test.ts",
