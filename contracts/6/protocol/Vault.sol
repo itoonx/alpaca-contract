@@ -208,14 +208,18 @@ contract Vault is IVault, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe, OwnableU
 
   /// @dev _fairLaunchDeposit
   function _fairLaunchDeposit(uint256 id, uint256 amount) internal {
-    IDebtToken(debtToken).mint(address(this), positions[id].debtShare);
-    IFairLaunch(config.getFairLaunchAddr()).deposit(positions[id].owner, fairLaunchPoolId, amount);
+    if (amount > 0) {
+      IDebtToken(debtToken).mint(address(this), positions[id].debtShare);
+      IFairLaunch(config.getFairLaunchAddr()).deposit(positions[id].owner, fairLaunchPoolId, amount);
+    }
   }
 
   /// @dev _fairLaunchWithdraw
   function _fairLaunchWithdraw(uint256 id) internal {
-    IFairLaunch(config.getFairLaunchAddr()).withdraw(positions[id].owner, fairLaunchPoolId, positions[id].debtShare);
-    IDebtToken(debtToken).burn(address(this), positions[id].debtShare);
+    if (positions[id].debtShare > 0) {
+      IFairLaunch(config.getFairLaunchAddr()).withdraw(positions[id].owner, fairLaunchPoolId, positions[id].debtShare);
+      IDebtToken(debtToken).burn(address(this), positions[id].debtShare);
+    }
   }
 
   /// @dev Create a new farming position to unlock your yield farming potential.
