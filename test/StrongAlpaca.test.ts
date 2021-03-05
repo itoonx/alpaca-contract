@@ -215,8 +215,9 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       // fast forward to the lockEndBlock
       await TimeHelpers.advanceBlockTo(nowBlock + 500)
 
-      // locked token of StrongAlpaca should be 150
+      // locked token of StrongAlpaca should be 150 while StrongAlpaca supply should be 150
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
+      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('150'))
 
       // alice unhodl
       expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
@@ -234,7 +235,7 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
 
       // strongAlpaca does not store any strongAlpaca, but burn instead
       expect(await strongAlpaca.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.balanceOf(ADDRESS0)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('50'))
 
       // bob unhodl
       expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
@@ -250,7 +251,7 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await strongAlpaca.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.balanceOf(ADDRESS0)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('0'))
     })
 
     it('should not allow to do so before alpacaToken.endReleaseBlock', async () => {
