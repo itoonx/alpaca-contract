@@ -79,8 +79,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     }
 
     uint256 userStrongAlpacaBalance = balanceOf(msg.sender);
-    // Note: user must approve this contract to move Strong Alpaca token to its address
-    // user transfer Strong Alpaca back
+    // StrongAlpaca burns all user's StrongAlpaca
     _burn(msg.sender, userStrongAlpacaBalance);
 
     // transfer Alpaca from Strong Alpaca to user

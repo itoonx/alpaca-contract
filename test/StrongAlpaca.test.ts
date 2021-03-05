@@ -222,7 +222,6 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       // alice unhodl
       expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('20'))
-      await strongAlpacaAsAlice.approve(strongAlpacaAsAlice.address, ethers.constants.MaxUint256)
       await expect(strongAlpacaAsAlice.unhodl())
         .to.emit(strongAlpacaAsAlice, 'Unhodl')
         .withArgs(aliceAddress, ethers.utils.parseEther('100'))
@@ -240,7 +239,6 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       // bob unhodl
       expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
-      await strongAlpacaAsBob.approve(strongAlpacaAsBob.address, ethers.constants.MaxUint256)
       await expect(strongAlpacaAsBob.unhodl())
         .to.emit(strongAlpacaAsBob, 'Unhodl')
         .withArgs(bobAddress, ethers.utils.parseEther('50'))
