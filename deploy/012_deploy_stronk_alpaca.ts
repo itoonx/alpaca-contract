@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 import { ethers } from 'hardhat';
-import { StrongAlpaca__factory } from '../typechain';
+import { StronkAlpaca__factory } from '../typechain';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     /*
@@ -29,18 +29,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 
 
-  console.log(">> Deploying a StrongAlpaca contract");
-  const StrongAlpaca = (await ethers.getContractFactory(   "StrongAlpaca",    (await ethers.getSigners())[0],  )) as StrongAlpaca__factory;
-  const strongAlpaca = await StrongAlpaca.deploy(
+  console.log(">> Deploying a StronkAlpaca contract");
+  const StronkAlpaca = (await ethers.getContractFactory(   "StronkAlpaca",    (await ethers.getSigners())[0],  )) as StronkAlpaca__factory;
+  const stronkAlpaca = await StronkAlpaca.deploy(
     ALPACA_TOKEN_ADDR,
     ethers.BigNumber.from(HODLABLE_END_BLOCK),
     ethers.BigNumber.from(LOCK_END_BLOCK),
   );
-  await strongAlpaca.deployed();
-  console.log(`>> Deployed at ${strongAlpaca.address}`);
+  await stronkAlpaca.deployed();
+  console.log(`>> Deployed at ${stronkAlpaca.address}`);
   console.log("✅ Done");
 
 };
 
 export default func;
-func.tags = ['StrongAlpaca'];
+func.tags = ['StronkAlpaca'];

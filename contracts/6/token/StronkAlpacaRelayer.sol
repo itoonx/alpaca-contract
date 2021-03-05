@@ -1,14 +1,14 @@
 pragma solidity 0.6.6;
 
 import "./interfaces/IAlpacaToken.sol";
-import "./interfaces/IStrongAlpacaRelayer.sol";
+import "./interfaces/IStronkAlpacaRelayer.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 
-contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer, ReentrancyGuard {
+contract StronkAlpacaRelayer is Ownable, IStronkAlpacaRelayer, ReentrancyGuard {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 

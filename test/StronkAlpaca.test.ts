@@ -6,24 +6,24 @@ import "@openzeppelin/test-helpers";
 import {
   AlpacaToken,
   AlpacaToken__factory,
-  StrongAlpaca,
-  StrongAlpaca__factory,
-  StrongAlpacaRelayer,
-  StrongAlpacaRelayer__factory
+  StronkAlpaca,
+  StronkAlpaca__factory,
+  StronkAlpacaRelayer,
+  StronkAlpacaRelayer__factory
 } from "../typechain";
 import * as TimeHelpers from "./helpers/time"
 
 chai.use(solidity);
 const { expect } = chai;
 
-describe("StrongAlpaca and StrongAlpacaRelayer", () => {
+describe("StronkAlpaca and StronkAlpacaRelayer", () => {
   /// Constant
   const ADDRESS0 = "0x0000000000000000000000000000000000000000";
 
   // Instance(s)
-  let strongAlpaca: StrongAlpaca;
-  let strongAlpacaAsAlice: StrongAlpaca
-  let strongAlpacaAsBob: StrongAlpaca;
+  let stronkAlpaca: StronkAlpaca;
+  let stronkAlpacaAsAlice: StronkAlpaca
+  let stronkAlpacaAsBob: StronkAlpaca;
   let alpacaToken: AlpacaToken;
   let alpacaTokenAsAlice: AlpacaToken;
   let alpacaTokenAsBob: AlpacaToken;
@@ -49,18 +49,18 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
     alpacaTokenAsAlice = AlpacaToken__factory.connect(alpacaToken.address, alice);
     alpacaTokenAsBob = AlpacaToken__factory.connect(alpacaToken.address, bob);
 
-    const StrongAlpaca = (await ethers.getContractFactory(
-      "StrongAlpaca",
+    const StronkAlpaca = (await ethers.getContractFactory(
+      "StronkAlpaca",
       deployer
-    )) as StrongAlpaca__factory;
-    strongAlpaca = await StrongAlpaca.deploy(alpacaToken.address, nowBlock + 100, nowBlock + 500);
-    await strongAlpaca.deployed();
+    )) as StronkAlpaca__factory;
+    stronkAlpaca = await StronkAlpaca.deploy(alpacaToken.address, nowBlock + 100, nowBlock + 500);
+    await stronkAlpaca.deployed();
 
-    strongAlpacaAsAlice = StrongAlpaca__factory.connect(strongAlpaca.address, alice);
-    strongAlpacaAsBob = StrongAlpaca__factory.connect(strongAlpaca.address, bob);
+    stronkAlpacaAsAlice = StronkAlpaca__factory.connect(stronkAlpaca.address, alice);
+    stronkAlpacaAsBob = StronkAlpaca__factory.connect(stronkAlpaca.address, bob);
   });
 
-  context('when alice and bob want to hodl StrongAlpaca', async () => {
+  context('when alice and bob want to hodl StronkAlpaca', async () => {
     it('should be able hodl successfully with correct balances', async () => {
       const aliceAddress = await alice.getAddress()
       const bobAddress = await bob.getAddress()
@@ -74,17 +74,17 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       await alpacaToken.lock(bobAddress, ethers.utils.parseEther('50'))
 
       // Alice prepare hodl
-      expect(await strongAlpaca.getRelayerAddress(aliceAddress)).to.equal(ADDRESS0)
-      await expect(strongAlpacaAsAlice.prepareHodl())
-        .to.emit(strongAlpacaAsAlice, 'PrepareHodl')
-      const aliceRelayerAddress = await strongAlpaca.getRelayerAddress(aliceAddress)
+      expect(await stronkAlpaca.getRelayerAddress(aliceAddress)).to.equal(ADDRESS0)
+      await expect(stronkAlpacaAsAlice.prepareHodl())
+        .to.emit(stronkAlpacaAsAlice, 'PrepareHodl')
+      const aliceRelayerAddress = await stronkAlpaca.getRelayerAddress(aliceAddress)
       expect(aliceRelayerAddress).to.not.equal(ADDRESS0)
 
       // Bob prepare hodl
-      expect(await strongAlpaca.getRelayerAddress(bobAddress)).to.equal(ADDRESS0)
-      await expect(strongAlpacaAsBob.prepareHodl())
-        .to.emit(strongAlpacaAsBob, 'PrepareHodl')
-      const bobRelayerAddress = await strongAlpaca.getRelayerAddress(bobAddress)
+      expect(await stronkAlpaca.getRelayerAddress(bobAddress)).to.equal(ADDRESS0)
+      await expect(stronkAlpacaAsBob.prepareHodl())
+        .to.emit(stronkAlpacaAsBob, 'PrepareHodl')
+      const bobRelayerAddress = await stronkAlpaca.getRelayerAddress(bobAddress)
       expect(bobRelayerAddress).to.not.equal(ADDRESS0)
 
       // make sure bobRelayerAddress != aliceRelayerAddress
@@ -113,69 +113,69 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       expect(await alpacaToken.lockOf(bobRelayerAddress)).to.deep.equal(ethers.utils.parseEther('50'))
 
       // Alice hodl!
-      expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      await expect(strongAlpacaAsAlice.hodl())
-        .to.emit(strongAlpacaAsAlice, 'Hodl')
+      expect(await alpacaToken.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      await expect(stronkAlpacaAsAlice.hodl())
+        .to.emit(stronkAlpacaAsAlice, 'Hodl')
         .withArgs(aliceAddress, aliceRelayerAddress, ethers.utils.parseEther('100'))
-      expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('100'))
+      expect(await alpacaToken.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(aliceRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(aliceRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('20'))
       expect(await alpacaToken.lockOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
+      expect(await stronkAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
 
       // Bob hodl!
-      await expect(strongAlpacaAsBob.hodl())
-        .to.emit(strongAlpacaAsBob, 'Hodl')
+      await expect(stronkAlpacaAsBob.hodl())
+        .to.emit(stronkAlpacaAsBob, 'Hodl')
         .withArgs(bobAddress, bobRelayerAddress, ethers.utils.parseEther('50'))
-      expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
+      expect(await alpacaToken.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
       expect(await alpacaToken.balanceOf(bobRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(bobRelayerAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.lockOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
+      expect(await stronkAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
 
-      // Evaluate the final balance of strongAlpaca
-      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('150'))
+      // Evaluate the final balance of stronkAlpaca
+      expect(await stronkAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('150'))
     })
   })
 
   context('when alice has already called prepareHodl once', async () => {
     it('should not allow to prepareHodl when user has already prepare hodl', async () => {
-      await strongAlpacaAsAlice.prepareHodl()
-      await expect(strongAlpacaAsAlice.prepareHodl())
+      await stronkAlpacaAsAlice.prepareHodl()
+      await expect(stronkAlpacaAsAlice.prepareHodl())
         .to.be
-        .revertedWith('StrongAlpaca::prepareHodl: user has already prepared hodl')
+        .revertedWith('StronkAlpaca::prepareHodl: user has already prepared hodl')
     })
   })
 
-  context('when alice want to hodl StrongAlpaca after hodlableEndBlock', async () => {
+  context('when alice want to hodl StronkAlpaca after hodlableEndBlock', async () => {
     it('should not allow to do so when block.number exceeds hodlableEndBlock', async () => {
       await TimeHelpers.advanceBlockTo(nowBlock + 100)
-      await expect(strongAlpacaAsAlice.prepareHodl())
+      await expect(stronkAlpacaAsAlice.prepareHodl())
         .to.be
-        .revertedWith('StrongAlpaca::prepareHodl: block.number exceeds hodlableEndBlock')
+        .revertedWith('StronkAlpaca::prepareHodl: block.number exceeds hodlableEndBlock')
     })
   })
 
-  context('when alice want to hodl StrongAlpaca but haven\'t prepare hodl', async () => {
+  context('when alice want to hodl StronkAlpaca but haven\'t prepare hodl', async () => {
     it('should not allow alice to do hodl', async () => {
-      await expect(strongAlpacaAsAlice.hodl())
+      await expect(stronkAlpacaAsAlice.hodl())
         .to.be
-        .revertedWith('StrongAlpaca::hodl: user has not preapare hodl yet')
+        .revertedWith('StronkAlpaca::hodl: user has not preapare hodl yet')
     })
   })
 
   context('when the relayer is created (prepareHodl)', async() => {
-    it('should allow transferAllAlpaca to be called by only StrongAlpaca contract', async () => {
+    it('should allow transferAllAlpaca to be called by only StronkAlpaca contract', async () => {
       const aliceAddress = await alice.getAddress()
-      await strongAlpacaAsAlice.prepareHodl()
-      const aliceRelayerAddress = await strongAlpaca.getRelayerAddress(aliceAddress)
-      const relayerAsAlice = StrongAlpacaRelayer__factory.connect(aliceRelayerAddress, alice)
-      const relayerAsBob = StrongAlpacaRelayer__factory.connect(aliceRelayerAddress, bob)
+      await stronkAlpacaAsAlice.prepareHodl()
+      const aliceRelayerAddress = await stronkAlpaca.getRelayerAddress(aliceAddress)
+      const relayerAsAlice = StronkAlpacaRelayer__factory.connect(aliceRelayerAddress, alice)
+      const relayerAsBob = StronkAlpacaRelayer__factory.connect(aliceRelayerAddress, bob)
 
       await expect(relayerAsAlice.transferAllAlpaca())
         .to.be
@@ -183,7 +183,7 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       await expect(relayerAsBob.transferAllAlpaca())
         .to.be
         .revertedWith('Ownable: caller is not the owner')
-      expect(await relayerAsAlice.owner()).to.be.equal(strongAlpaca.address)
+      expect(await relayerAsAlice.owner()).to.be.equal(stronkAlpaca.address)
     })
   })
 
@@ -199,71 +199,71 @@ describe("StrongAlpaca and StrongAlpacaRelayer", () => {
       await alpacaToken.lock(bobAddress, ethers.utils.parseEther('50'))
 
       // prepare hodl
-      await strongAlpacaAsAlice.prepareHodl()
-      const aliceRelayerAddress = await strongAlpaca.getRelayerAddress(aliceAddress)
-      await strongAlpacaAsBob.prepareHodl()
-      const bobRelayerAddress = await strongAlpaca.getRelayerAddress(bobAddress)
+      await stronkAlpacaAsAlice.prepareHodl()
+      const aliceRelayerAddress = await stronkAlpaca.getRelayerAddress(aliceAddress)
+      await stronkAlpacaAsBob.prepareHodl()
+      const bobRelayerAddress = await stronkAlpaca.getRelayerAddress(bobAddress)
 
       // transfer alapace to relayer
       await alpacaTokenAsAlice.transferAll(aliceRelayerAddress)
       await alpacaTokenAsBob.transferAll(bobRelayerAddress)
 
       // hodl
-      await strongAlpacaAsAlice.hodl()
-      await strongAlpacaAsBob.hodl()
+      await stronkAlpacaAsAlice.hodl()
+      await stronkAlpacaAsBob.hodl()
 
       // fast forward to the lockEndBlock
       await TimeHelpers.advanceBlockTo(nowBlock + 500)
 
-      // locked token of StrongAlpaca should be 150 while StrongAlpaca supply should be 150
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
-      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('150'))
+      // locked token of StronkAlpaca should be 150 while StronkAlpaca supply should be 150
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('150'))
+      expect(await stronkAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('150'))
 
       // alice unhodl
-      expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
+      expect(await stronkAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('100'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('20'))
-      await expect(strongAlpacaAsAlice.unhodl())
-        .to.emit(strongAlpacaAsAlice, 'Unhodl')
+      await expect(stronkAlpacaAsAlice.unhodl())
+        .to.emit(stronkAlpacaAsAlice, 'Unhodl')
         .withArgs(aliceAddress, ethers.utils.parseEther('100'))
-      expect(await strongAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await stronkAlpaca.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(aliceAddress)).to.deep.equal(ethers.utils.parseEther('120'))
 
-      // locked token of StrongAlpaca should be 0, and the alpaca token should be (all - 100)
-      expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('50'))
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      // locked token of StronkAlpaca should be 0, and the alpaca token should be (all - 100)
+      expect(await alpacaToken.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('50'))
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
 
-      // strongAlpaca does not store any strongAlpaca, but burn instead
-      expect(await strongAlpaca.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('50'))
+      // stronkAlpaca does not store any stronkAlpaca, but burn instead
+      expect(await stronkAlpaca.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await stronkAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('50'))
 
       // bob unhodl
-      expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
+      expect(await stronkAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
-      await expect(strongAlpacaAsBob.unhodl())
-        .to.emit(strongAlpacaAsBob, 'Unhodl')
+      await expect(stronkAlpacaAsBob.unhodl())
+        .to.emit(stronkAlpacaAsBob, 'Unhodl')
         .withArgs(bobAddress, ethers.utils.parseEther('50'))
-      expect(await strongAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await stronkAlpaca.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('0'))
       expect(await alpacaToken.balanceOf(bobAddress)).to.deep.equal(ethers.utils.parseEther('50'))
 
-      // strongAlpaca does not store any strongAlpaca, but burn instead
-      expect(await alpacaToken.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await alpacaToken.lockOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.balanceOf(strongAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
-      expect(await strongAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('0'))
+      // stronkAlpaca does not store any stronkAlpaca, but burn instead
+      expect(await alpacaToken.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await alpacaToken.lockOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await stronkAlpaca.balanceOf(stronkAlpaca.address)).to.deep.equal(ethers.utils.parseEther('0'))
+      expect(await stronkAlpaca.totalSupply()).to.deep.equal(ethers.utils.parseEther('0'))
     })
 
     it('should not allow to do so before alpacaToken.endReleaseBlock', async () => {
-      await expect(strongAlpacaAsAlice.unhodl())
+      await expect(stronkAlpacaAsAlice.unhodl())
         .to.be
-        .revertedWith('StrongAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock')
+        .revertedWith('StronkAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock')
     })
 
     it('should not allow to do so before lockEndBlock', async () => {
       // fast forward to alpacaToken.endReleaseBlock
       await TimeHelpers.advanceBlockTo(nowBlock + 300)
-      await expect(strongAlpacaAsAlice.unhodl())
+      await expect(stronkAlpacaAsAlice.unhodl())
         .to.be
-        .revertedWith('StrongAlpaca::unhodl: block.number have not reach lockEndBlock')
+        .revertedWith('StronkAlpaca::unhodl: block.number have not reach lockEndBlock')
     })
 
   })
