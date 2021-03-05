@@ -35,8 +35,7 @@ contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
   }
 
   function transferAllAlpaca() external override blockReentrancy onlyOwner {
-    SafeERC20.safeApprove(IERC20(alpacaTokenAddress), address(this), IERC20(alpacaTokenAddress).balanceOf(address(this)));
-    SafeERC20.safeTransferFrom(IERC20(alpacaTokenAddress), address(this), userAddress, IERC20(alpacaTokenAddress).balanceOf(address(this)));
+    SafeERC20.safeTransfer(IERC20(alpacaTokenAddress), userAddress, IERC20(alpacaTokenAddress).balanceOf(address(this)));
     IAlpacaToken(alpacaTokenAddress).transferAll(msg.sender);
   }
 }
