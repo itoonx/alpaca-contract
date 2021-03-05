@@ -8,8 +8,6 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../interfaces/ILocker.sol";
 import "../interfaces/IFairLaunch.sol";
 
-import "hardhat/console.sol";
-
 contract LinearRelease is Ownable, ReentrancyGuard {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;

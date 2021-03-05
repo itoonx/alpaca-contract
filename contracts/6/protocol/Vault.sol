@@ -234,7 +234,7 @@ contract Vault is IVault, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe, OwnableU
   {
     require(fairLaunchPoolId != uint256(-1), "work: poolId not set");
     // 1. Sanity check the input position, or add a new position of ID is 0.
-    Position storage pos;
+    Position memory pos;
     if (id == 0) {
       id = nextPositionID++;
       pos = positions[id];

@@ -55,8 +55,6 @@ contract FairLaunchV2 is Ownable {
   uint256 totalAllocPoint;
 
   uint256 private constant ACC_ALPACA_PRECISION = 1e12;
-  bytes4 private constant SIG_ON_ALPACA_REWARD = 0xd5ec3bbb; // onAlpacaReward(uint256,address,uint256)
-  bytes4 private constant SIG_ALPACA_PER_BLOCK = 0x20f33d59;
 
   event Deposit(address indexed user, uint256 indexed pid, uint256 amount, address indexed to);
   event Withdraw(address indexed user, uint256 indexed pid, uint256 amount, address indexed to);
@@ -261,7 +259,7 @@ contract FairLaunchV2 is Ownable {
   function _harvest(address to, uint256 pid) internal harvestFromFairLaunchV1 {
     PoolInfo memory pool = updatePool(pid);
     UserInfo storage user = userInfo[pid][to];
-    uint256 accumulatedAlpaca = user.amount.mul(pool.accAlpacaPerShare) / ACC_ALPACA_PRECISION;
+    uint256 accumulatedAlpaca = user.amount.mul(pool.accAlpacaPerShare).div(ACC_ALPACA_PRECISION);
     uint256 _pendingAlpaca = accumulatedAlpaca.sub(user.rewardDebt);
     if (_pendingAlpaca == 0) { return; }
 
@@ -277,6 +275,7 @@ contract FairLaunchV2 is Ownable {
       ALPACA.approve(address(_locker), lockAmount);
       _locker.lock(to, lockAmount);
       _pendingAlpaca = _pendingAlpaca.sub(lockAmount);
+      ALPACA.approve(address(_locker), 0);
     }
 
     ALPACA.safeTransfer(to, _pendingAlpaca);
