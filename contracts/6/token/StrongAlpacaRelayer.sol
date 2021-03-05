@@ -4,7 +4,6 @@ import "./AlpacaToken.sol";
 import "./interfaces/IStrongAlpacaRelayer.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
 
 contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
   using SafeMath for uint256;
