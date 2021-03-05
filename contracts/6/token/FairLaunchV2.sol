@@ -234,7 +234,6 @@ contract FairLaunchV2 is Ownable {
     require(user.amount >= amount, "withdraw: not good");
 
     // Effects
-    updatePool(pid);
     _harvest(_for, pid);
 
     user.rewardDebt = user.rewardDebt.sub(amount.mul(pool.accAlpacaPerShare) / ACC_ALPACA_PRECISION);
@@ -257,7 +256,7 @@ contract FairLaunchV2 is Ownable {
   /// @param pid The index of the pool. See `poolInfo`.
   /// @param to Receiver of ALPACA rewards.
   function _harvest(address to, uint256 pid) internal harvestFromFairLaunchV1 {
-    PoolInfo memory pool = updatePool(pid);
+    PoolInfo memory pool = poolInfo[pid];
     UserInfo storage user = userInfo[pid][to];
     uint256 accumulatedAlpaca = user.amount.mul(pool.accAlpacaPerShare).div(ACC_ALPACA_PRECISION);
     uint256 _pendingAlpaca = accumulatedAlpaca.sub(user.rewardDebt);
