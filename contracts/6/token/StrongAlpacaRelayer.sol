@@ -1,16 +1,18 @@
 pragma solidity 0.6.6;
 
-import "./AlpacaToken.sol";
+import "./interfaces/IAlpacaToken.sol";
 import "./interfaces/IStrongAlpacaRelayer.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 
 contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
   // Alpaca address
-  AlpacaToken public alpacaToken;
+  address public alpacaTokenAddress;
 
   // User address
   address public userAddress;
@@ -28,14 +30,13 @@ contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
     address _alpacaAddress,
     address _userAddress
   ) public {
-    alpacaToken = AlpacaToken(_alpacaAddress);
+    alpacaTokenAddress = _alpacaAddress;
     userAddress = _userAddress;
   }
 
   function transferAllAlpaca() external override blockReentrancy onlyOwner {
-    address strongAlpacaAddress = msg.sender;
-    SafeERC20.safeApprove(alpacaToken, address(this), alpacaToken.balanceOf(address(this)));
-    SafeERC20.safeTransferFrom(alpacaToken, address(this), userAddress, alpacaToken.balanceOf(address(this)));
-    alpacaToken.transferAll(strongAlpacaAddress);
+    SafeERC20.safeApprove(IERC20(alpacaTokenAddress), address(this), IERC20(alpacaTokenAddress).balanceOf(address(this)));
+    SafeERC20.safeTransferFrom(IERC20(alpacaTokenAddress), address(this), userAddress, IERC20(alpacaTokenAddress).balanceOf(address(this)));
+    IAlpacaToken(alpacaTokenAddress).transferAll(msg.sender);
   }
 }

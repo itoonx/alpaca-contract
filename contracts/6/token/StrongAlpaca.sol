@@ -1,7 +1,7 @@
 pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IAlpacaToken.sol";
 import "./interfaces/IStrongAlpaca.sol";
 import "./StrongAlpacaRelayer.sol";
