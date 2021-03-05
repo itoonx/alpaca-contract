@@ -63,7 +63,6 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     address relayerAddress = _userRelayerMap[msg.sender];
 
     require(relayerAddress != address(0), "StrongAlpaca::hodl: user has not preapare hodl yet");
-    require(block.number < hodlableEndBlock, "StrongAlpaca::hodl: block.number exceeds hodlableEndBlock");
 
     uint256 relayerAlpacaLockedBalance = IAlpacaToken(alpacaTokenAddress).lockOf(relayerAddress);
     StrongAlpacaRelayer relayer = StrongAlpacaRelayer(relayerAddress);
