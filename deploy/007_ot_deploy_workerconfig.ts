@@ -13,8 +13,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   ░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝╚═╝╚═╝░░╚══╝░╚═════╝░
   Check all variables below before execute the deployment script
   */
-  const SIMPLE_ORACLE_ADDR = '0x166f56F2EDa9817cAB77118AE4FCAA0002A17eC7';
-  const TIMELOCK = '0x2D5408f2287BF9F9B05404794459a846651D0a59';
+  const SIMPLE_ORACLE_ADDR = '0xcaC1512f8D1fB21fe91C1b6b7EF7F9b5CC6ab5F8';
+  const TIMELOCK = '0x771F70042ebb6d2Cfc29b7BF9f3caf9F959385B8';
 
 
 
