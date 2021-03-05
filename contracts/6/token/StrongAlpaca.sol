@@ -91,8 +91,8 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     SafeERC20.safeTransferFrom(this, msg.sender, address(this), userStrongAlpacaBalance);
 
     // transfer Alpaca from Strong Alpaca to user
-    SafeERC20.safeApprove(IERC20(alpacaTokenAddress), address(this), userStrongAlpacaBalance);
-    SafeERC20.safeTransferFrom(IERC20(alpacaTokenAddress), address(this), msg.sender, userStrongAlpacaBalance);
+    SafeERC20.safeTransfer(IERC20(alpacaTokenAddress), msg.sender, userStrongAlpacaBalance);
+
     emit Unhodl(msg.sender, userStrongAlpacaBalance);
   }
 
