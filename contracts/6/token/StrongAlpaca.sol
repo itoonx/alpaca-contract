@@ -2,9 +2,9 @@ pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "./AlpacaToken.sol";
-import "./StrongAlpacaRelayer.sol";
+import "./interfaces/IAlpacaToken.sol";
 import "./interfaces/IStrongAlpaca.sol";
+import "./StrongAlpacaRelayer.sol";
 import "../utils/SafeToken.sol";
 
 // StrongHodl is a smart contract for ALPACA time-locking by asking user to lock ALPACA for a period of time.
@@ -20,7 +20,6 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
 
   // Alpaca address
   address public alpacaTokenAddress;
-  AlpacaToken public alpacaToken;
 
   // To track the portion of each user Alpaca
   mapping(address => address) private _userRelayerMap;
@@ -39,13 +38,12 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
   }
 
   constructor(
-    AlpacaToken _alpacaAddress,
+    address _alpacaAddress,
     uint256 _hodlableEndBlock,
     uint256 _lockEndBlock
   ) public {
     _setupDecimals(18);
-    alpacaToken = _alpacaAddress;
-    alpacaTokenAddress = address(_alpacaAddress);
+    alpacaTokenAddress = _alpacaAddress;
 
     hodlableEndBlock = _hodlableEndBlock;
     lockEndBlock = _lockEndBlock;
@@ -67,7 +65,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     require(relayerAddress != address(0), "StrongAlpaca::hodl: user has not preapare hodl yet");
     require(block.number < hodlableEndBlock, "StrongAlpaca::hodl: block.number exceeds hodlableEndBlock");
 
-    uint256 relayerAlpacaLockedBalance = alpacaToken.lockOf(relayerAddress);
+    uint256 relayerAlpacaLockedBalance = IAlpacaToken(alpacaTokenAddress).lockOf(relayerAddress);
     StrongAlpacaRelayer relayer = StrongAlpacaRelayer(relayerAddress);
 
     relayer.transferAllAlpaca();
@@ -77,15 +75,15 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
 
   function unhodl() external override blockReentrancy {
     require(
-      block.number > alpacaToken.endReleaseBlock(),
+      block.number > IAlpacaToken(alpacaTokenAddress).endReleaseBlock(),
       "StrongAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock"
     );
     require(block.number > lockEndBlock, "StrongAlpaca::unhodl: block.number have not reach lockEndBlock");
 
     // unlock all the Alpaca token in case it never have been unlocked yet
     // Note: given that releasePeriodEnd has passed, so that locked token has been 100% released
-    if (alpacaToken.lockOf(address(this)) > 0) {
-      alpacaToken.unlock();
+    if (IAlpacaToken(alpacaTokenAddress).lockOf(address(this)) > 0) {
+      IAlpacaToken(alpacaTokenAddress).unlock();
     }
 
     uint256 userStrongAlpacaBalance = balanceOf(msg.sender);
@@ -94,8 +92,8 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     SafeERC20.safeTransferFrom(this, msg.sender, address(this), userStrongAlpacaBalance);
 
     // transfer Alpaca from Strong Alpaca to user
-    SafeERC20.safeApprove(alpacaToken, address(this), userStrongAlpacaBalance);
-    SafeERC20.safeTransferFrom(alpacaToken, address(this), msg.sender, userStrongAlpacaBalance);
+    SafeERC20.safeApprove(IERC20(alpacaTokenAddress), address(this), userStrongAlpacaBalance);
+    SafeERC20.safeTransferFrom(IERC20(alpacaTokenAddress), address(this), msg.sender, userStrongAlpacaBalance);
     emit Unhodl(msg.sender, userStrongAlpacaBalance);
   }
 
