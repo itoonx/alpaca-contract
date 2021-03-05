@@ -5,9 +5,10 @@ import "./interfaces/IStrongAlpacaRelayer.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 
-contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
+contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer, ReentrancyGuard {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -17,15 +18,6 @@ contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
   // User address
   address public userAddress;
 
-  // only contract can change this variable
-  bool internal locked;
-  modifier blockReentrancy {
-    require(!locked, "Contract is locked");
-    locked = true;
-    _;
-    locked = false;
-  }
-
   constructor(
     address _alpacaAddress,
     address _userAddress
@@ -34,7 +26,7 @@ contract StrongAlpacaRelayer is Ownable, IStrongAlpacaRelayer {
     userAddress = _userAddress;
   }
 
-  function transferAllAlpaca() external override blockReentrancy onlyOwner {
+  function transferAllAlpaca() external override nonReentrant onlyOwner {
     SafeERC20.safeTransfer(IERC20(alpacaTokenAddress), userAddress, IERC20(alpacaTokenAddress).balanceOf(address(this)));
     IAlpacaToken(alpacaTokenAddress).transferAll(msg.sender);
   }

@@ -2,13 +2,14 @@ pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IAlpacaToken.sol";
 import "./interfaces/IStrongAlpaca.sol";
 import "./StrongAlpacaRelayer.sol";
 import "../utils/SafeToken.sol";
 
 // StrongHodl is a smart contract for ALPACA time-locking by asking user to lock ALPACA for a period of time.
-contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownable {
+contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownable, ReentrancyGuard {
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
@@ -29,14 +30,6 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
   event Hodl(address indexed user, address indexed relayer, uint256 receivingStrongAlpacaAmount);
   event Unhodl(address indexed user, uint256 receivingAlpacaAmount);
 
-  bool internal locked; //only contract can change this variable
-  modifier blockReentrancy {
-    require(!locked, "Contract is locked");
-    locked = true;
-    _;
-    locked = false;
-  }
-
   constructor(
     address _alpacaAddress,
     uint256 _hodlableEndBlock,
@@ -49,7 +42,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     lockEndBlock = _lockEndBlock;
   }
 
-  function prepareHodl() external override blockReentrancy {
+  function prepareHodl() external override nonReentrant {
     require(_userRelayerMap[msg.sender] == address(0), "StrongAlpaca::prepareHodl: user has already prepared hodl");
     require(block.number < hodlableEndBlock, "StrongAlpaca::prepareHodl: block.number exceeds hodlableEndBlock");
 
@@ -59,7 +52,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     emit PrepareHodl(msg.sender, address(relayer));
   }
 
-  function hodl() external override blockReentrancy {
+  function hodl() external override nonReentrant {
     address relayerAddress = _userRelayerMap[msg.sender];
 
     require(relayerAddress != address(0), "StrongAlpaca::hodl: user has not preapare hodl yet");
@@ -72,7 +65,7 @@ contract StrongAlpaca is IStrongAlpaca, ERC20("Stronk Alpaca", "sALPACA"), Ownab
     emit Hodl(msg.sender, address(relayer), relayerAlpacaLockedBalance);
   }
 
-  function unhodl() external override blockReentrancy {
+  function unhodl() external override nonReentrant {
     require(
       block.number > IAlpacaToken(alpacaTokenAddress).endReleaseBlock(),
       "StrongAlpaca::unhodl: block.number have not reach alpacaToken.endReleaseBlock"
