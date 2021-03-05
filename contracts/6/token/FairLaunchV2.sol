@@ -9,10 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./interfaces/IFairLaunchV1.sol";
 import "./interfaces/ILocker.sol";
 
-import "hardhat/console.sol";
-
-/// @notice The (older) FairLaunch contract lock and vest machanic embeded in AlpacaToken
-/// Hence to make the protocol to be able to adjust those lock and vest machanic we need FairLaunchV2
+/// @notice The (older) FairLaunch contract lock and vest mechanic embeded in AlpacaToken
+/// Hence to make the protocol to be able to adjust those lock and vest mechanic we need FairLaunchV2
 /// However, FairLaunch is the only owner with the right to mint AlpacaToken,
 /// therefore newly minted Alpaca will go out from FairLaunch but then FairLaunchV2 will be the only one
 /// that own and stake a dummy token on FairLaunch contract. Allocation point of every pools on FairLaunchV1 must
