@@ -1,6 +1,9 @@
 {
+  "Timelock": {
+    "address": "0x41bfb641F22412d349E95D8e5dfbEFA43920B73A"
+  },
   "FairLaunch": {
-    "address": "0xc336fFe6aDD4CAdD3aD050c826Ec3c995cC3a3AC",
+    "address": "0xE30b1008e85C5e6aA18f828954C6b0DB787cd60f",
     "pools": [{
       "id": 0,
       "stakingToken": "debtibBNB",
@@ -30,8 +33,8 @@
   },
   "Exchanges": {
     "Pancakeswap": {
-      "UniswapV2Factory": "0x93d814EBBD19BCf220890363a899004Df0922569",
-      "UniswapV2Router02": "0xEAF62f7bEaC130A36b3770EFd597f7678D7182F3",
+      "UniswapV2Factory": "0x6923ed943E448571F9d8dbA059500719154cD2D5",
+      "UniswapV2Router02": "0x3a7d31325E8FE684A9f5c51f878f892AB9A6EC68",
       "MasterChef": "0x3d9248518Cd0B9e3e0427052AAeb8ef9e330B3B1",
       "LpTokens": [{
         "pId": 1,
@@ -57,11 +60,11 @@
     }
   },
   "Tokens": {
-    "WBNB": "0x0421b6CE68C71708CD18652aF5123fc2573DBCCC",
-    "ALPACA": "0xe18D383f8a591a2Ec9752Bf4D68D2E15db9968f6",
-    "BUSD": "0x1f1F4D015A3CE748b838f058930dea311F3b69AE",
-    "CAKE": "0x82897976C5336dfe40feC5aD0F2a77bF88E87127",
-    "SYRUP": "0x655dEe1fB07f51EE19dd1EA8F7C6fDedc2BF9E08",
+    "WBNB": "0x88219905bA8FdC8018fD931d02d3E119f87eC19d",
+    "ALPACA": "0x9a829e946E0ED8cF0C03Cbc2875043ba2625871c",
+    "BUSD": "0xDA6d9493F1E1809A9F0Bee7D4604466B0C7F70F3",
+    "CAKE": "0x602B154b49D111B6F4299fE7D1DF3fb5D84982c7",
+    "SYRUP": "0xB39156a03b851de52dB287B4BA929Ca01A23F415",
     "USDT": "0x0DD2353e2a0258f64b2413e7f6b0C3853725195f",
     "BTCB": "0xA20d5B0fC43446F24dc90A6Bf712cb551FF63de2",
     "ETH": "0xBA7ccf5aa03B678E523C84Fab7Fb78135fA2ae4e"
@@ -75,7 +78,7 @@
     "WNativeRelayer": "0xE6F3a2B216824F91679A966dCaFd1d56F84c6E9A"
   },
   "Oracle": {
-    "SimpleOracle": "0x266BbB82858FdB85109612D523AC48D269dE47f1"
+    "SimpleOracle": ""
   },
   "Vaults": [{
     "name": "Interest Bearing WBNB",

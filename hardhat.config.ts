@@ -2,8 +2,9 @@ import { config as dotEnvConfig } from "dotenv";
 dotEnvConfig();
 
 import "@openzeppelin/hardhat-upgrades";
-
 import "@nomiclabs/hardhat-waffle";
+
+import "hardhat-gas-reporter";
 import "hardhat-typechain";
 import "hardhat-deploy";
 import "solidity-coverage";
@@ -40,6 +41,7 @@ module.exports = {
       url: 'https://data-seed-prebsc-1-s3.binance.org:8545',
       accounts: [process.env.BSC_TESTNET_PRIVATE_KEY],
       timeout: 18000000,
+      gas: 16000000 // 16 Gwei
     },
     mainnet: {
       url: 'https://bsc-dataseed1.ninicoin.io',
@@ -86,4 +88,7 @@ module.exports = {
     outDir: './typechain',
     target: process.env.TYPECHAIN_TARGET || 'ethers-v5',
   },
+  gasReporter: {
+    enabled: (process.env.REPORT_GAS) ? true : false
+  }
 };

@@ -15,9 +15,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   */
 
   // PancakeRouter
-  const ROUTER = '0xD99D1c33F9fC3444f8101754aBC46c52416550D1'; // testnet
-  const TIMELOCK = '0x0A30566db0D76e90E20d03F929bb45456cE804A5';
+  // const ROUTER = '0x3a7d31325E8FE684A9f5c51f878f892AB9A6EC68'; // testnet
+  // const TIMELOCK = '0x41bfb641F22412d349E95D8e5dfbEFA43920B73A';
 
+
+  const ROUTER = '0x3a7d31325E8FE684A9f5c51f878f892AB9A6EC68'; // testnet
+  const TIMELOCK = '0x0A30566db0D76e90E20d03F929bb45456cE804A5';
 
 
 

@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
+import { ethers, upgrades } from 'hardhat';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   /*
@@ -12,11 +13,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  // const ADMIN_ADDRESS = '0x3394AAD3EBde856f82BC900Bf6008c7Aca343066';
+  const ADMIN_ADDRESS = process.env.ADMIN_ADDRESS;
   const DELAY_IN_DAYS = 1;
 
+  // const DELAY = DELAY_IN_DAYS*24*60*60;
 
-
+  // testing
+  const DELAY_IN_MIN = 1000*60;
 
 
 
@@ -36,12 +39,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('Timelock', {
     from: deployer,
     args: [
-      deployer,
-      DELAY_IN_DAYS*24*60*60,
+      ADMIN_ADDRESS,
+      DELAY_IN_MIN
     ],
     log: true,
     deterministicDeployment: false,
   });
+
 
 };
 

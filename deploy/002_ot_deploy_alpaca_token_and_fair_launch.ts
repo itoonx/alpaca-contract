@@ -49,7 +49,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const alpacaToken = AlpacaToken__factory.connect(
-    (await deployments.get('AlpacaToken')).address, (await ethers.getSigners())[0]);
+    (await deployments.get('AlpacaToken')).address,
+    (await ethers.getSigners())[0]
+  );
 
   await deploy('FairLaunch', {
     from: deployer,
