@@ -38,6 +38,7 @@ module.exports = {
     testnet: {
       url: 'https://data-seed-prebsc-1-s3.binance.org:8545',
       accounts: [process.env.BSC_TESTNET_PRIVATE_KEY],
+      timeout: 18000000,
     },
     mainnet: {
       url: 'https://bsc-dataseed1.ninicoin.io',

@@ -14,8 +14,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const ROUTER = '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F';
-  const TIMELOCK = '0x2D5408f2287BF9F9B05404794459a846651D0a59';
+  // PancakeRouter
+  const ROUTER = '0xD99D1c33F9fC3444f8101754aBC46c52416550D1'; // testnet
+  const TIMELOCK = '0x0A30566db0D76e90E20d03F929bb45456cE804A5';
 
 
 
