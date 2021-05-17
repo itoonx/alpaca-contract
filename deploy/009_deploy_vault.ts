@@ -15,10 +15,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   */
 
   const FAIR_LAUNCH_ADDR = '0xA625AB01B08ce023B2a342Dbb12a16f2C8489A8F';
+  
   const ALLOC_POINT_FOR_DEPOSIT = 100;
   const ALLOC_POINT_FOR_OPEN_POSITION = 100;
-  const CONFIG_ADDR = '0xd7b805E88c5F52EDE71a9b93F7048c8d632DBEd4';
-  const BASE_TOKEN_ADDR = '0xe9e7cea3dedca5984780bafc599bd69add087d56'
+  const CONFIG_ADDR = '0xd7b805E88c5F52EDE71a9b93F7048c8d632DBEd4'; // ConfigAddress Deploy by my self
+
+  const BASE_TOKEN_ADDR = '0xe9e7cea3dedca5984780bafc599bd69add087d56' // BUSD
   const VAULT_NAME = 'BUSD VAULT'
   const NAME = 'Interest Bearing BUSD'
   const SYMBOL = 'ibBUSD';

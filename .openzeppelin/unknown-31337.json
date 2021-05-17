@@ -120,8 +120,8 @@
       }
     },
     "026142ba7a51ea17afdba8db51649e139fcb3a6937b369582ba7b8c94ee88cea": {
-      "address": "0x245C7376CB39D3387D370cc14C4135c2567D821a",
-      "txHash": "0xf8c2a05452194d411e0652d347cafca1f22a84233d3acd1fdce813a4458a69bc",
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "txHash": "0xf722074a3a8cfaae4088e16610b5ebd86a83f1b346eb350277b73994bef31bf0",
       "layout": {
         "storage": [
           {
@@ -1605,7 +1605,7 @@
     }
   },
   "admin": {
-    "address": "0xBc42a249F1244059C625B5c9366c42CA8bb17d29",
-    "txHash": "0x4c9f1f67aed96a3191e05bca73f6ac5729e9a2758f772bec72c28e95f154d704"
+    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "txHash": "0x52c9be0ab70f72512f49bb48732a9065e7375148954544397ec32cd4022ff196"
   }
 }

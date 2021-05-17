@@ -14,7 +14,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const TIMELOCK_ADDRESS = '0x2D5408f2287BF9F9B05404794459a846651D0a59';
+  const TIMELOCK = process.env.TIMELOCK_ADDR;
+
   const TO_BE_LOCKED = [
     '0xA625AB01B08ce023B2a342Dbb12a16f2C8489A8F',
     '0x166f56F2EDa9817cAB77118AE4FCAA0002A17eC7',
@@ -38,7 +39,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   for(let i = 0; i < TO_BE_LOCKED.length; i++ ) {
     console.log(`>> Transferring ownership of ${TO_BE_LOCKED[i]} to TIMELOCK`);
     const ownable = Ownable__factory.connect(TO_BE_LOCKED[i], (await ethers.getSigners())[0]);
-    await ownable.transferOwnership(TIMELOCK_ADDRESS);
+    await ownable.transferOwnership(TIMELOCK);
     console.log("✅ Done")
   }
 };

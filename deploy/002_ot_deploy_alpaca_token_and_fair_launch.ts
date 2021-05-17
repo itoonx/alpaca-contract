@@ -41,8 +41,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy('AlpacaToken', {
     from: deployer,
     args: [
-      6499649,
-      6699649,
+      6499649, // Release Start Block
+      6699649, // Release End Block
     ],
     log: true,
     deterministicDeployment: false,

@@ -17,7 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const VAULT_ADDR = '0x91f956875FbFf34e14E37E3c3daEf5C979e6351F';
   const ROUTER = '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F';
 
-  const TIMELOCK = '';
+  const TIMELOCK = process.env.TIMELOCK_ADDR;
 
 
 
