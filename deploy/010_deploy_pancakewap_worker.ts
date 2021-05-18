@@ -18,8 +18,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const VAULT_CONFIG_ADDR = "0x763972E762ef81F048b60bEaF178887DA1909482";
-  const WORKER_CONFIG_ADDR = '0x84C1Dcea4c4d29fE00b4862Fe9797D846e55241B';
+  const VAULT_CONFIG_ADDR = "0x1CE76F2DC36657E6bd750817D7d6A51a3Facf05f";
+  const WORKER_CONFIG_ADDR = '0x12641Bc011eeD2aF60249cfD5210A0B48BA5BD8e';
 
   const WORKER_NAME = "WBNB-BUSD PancakeswapWorker"
   const POOL_ID = 11;

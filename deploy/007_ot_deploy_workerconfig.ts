@@ -30,6 +30,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 
 
+
   console.log(">> Deploying an upgradable WorkerConfig contract");
   const WorkerConfig = (await ethers.getContractFactory(
     'WorkerConfig',

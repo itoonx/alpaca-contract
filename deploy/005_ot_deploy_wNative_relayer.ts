@@ -12,7 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const WNATV_ADDR = "0x88219905bA8FdC8018fD931d02d3E119f87eC19d"; // WBNB
+  const WNATV_ADDR = process.env.WNATV_ADDR; // WBNB
 
 
 
