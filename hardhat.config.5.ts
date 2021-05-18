@@ -3,6 +3,7 @@ dotEnvConfig();
 
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
 
 import "hardhat-gas-reporter";
 import "hardhat-typechain";
@@ -39,7 +40,8 @@ module.exports = {
     testnet: {
       url: 'https://data-seed-prebsc-1-s3.binance.org:8545',
       accounts: [process.env.BSC_TESTNET_PRIVATE_KEY],
-      timeout: 18000000
+      timeout: 18000000,
+      gas: 1600000
     },
     mainnet: {
       url: 'https://bsc-dataseed1.ninicoin.io',
@@ -50,6 +52,11 @@ module.exports = {
     deployer: {
       default: 0,
     },
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: process.env.BSCSCAN_KEY
   },
   solidity: {
     version: '0.5.16',

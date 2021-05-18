@@ -18,23 +18,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   Check all variables below before execute the deployment script
   */
 
-  const VAULT_CONFIG_ADDR = '0x6264bAc912F046a05950f852d1B65a31Fe756d9A'; // ibBUSD - Config
-  const WORKER_CONFIG_ADDR = '0x56dA57F1d6750b1674051399d37B040202f8834A'; // ibWBNB - Worker - Config
+  const VAULT_CONFIG_ADDR = "0x763972E762ef81F048b60bEaF178887DA1909482";
+  const WORKER_CONFIG_ADDR = '0x84C1Dcea4c4d29fE00b4862Fe9797D846e55241B';
 
   const WORKER_NAME = "WBNB-BUSD PancakeswapWorker"
   const POOL_ID = 11;
-  const VAULT_ADDR = '0x91f956875FbFf34e14E37E3c3daEf5C979e6351F' // ibBUSD
-  const BASE_TOKEN_ADDR = '0xe9e7cea3dedca5984780bafc599bd69add087d56' // BUSD
-  const MASTER_CHEF_ADDR = '0x73feaa1eE314F8c655E354234017bE2193C9E24E' // MasterChef
-  const PANCAKESWAP_ROUTER_ADDR = '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F';
-  const ADD_STRAT_ADDR = '0x46b7f21BFA7eEFDE1aB59EC1fe80de713Ec2Bf17'; // StrategyAddBaseTokenOnly
-  const LIQ_STRAT_ADDR = '0xaD4F6EcB4cb0BBC172E4B8174164D803dD4a5D39'; // StrategyLiquidate
+  const VAULT_ADDR = process.env.VAULT_ADDR // Vault - BUSD Address
+  const BASE_TOKEN_ADDR = process.env.BASE_TOKEN_ADDR;
+
+  const ROUTER = process.env.ROUTER;
+  const MASTERCHEF = process.env.MASTERCHEF;
+
+  const ADD_STRAT_ADDR = process.env.ADD_STRAT_ADDR; // StrategyAddBaseTokenOnly
+  const LIQ_STRAT_ADDR = process.env.LIQ_STRAT_ADDR; // StrategyLiquidate
+
   const REINVEST_BOUNTY_BPS = '300';
   const WORK_FACTOR = '6000';
   const KILL_FACTOR = '8000';
   const MAX_PRICE_DIFF = '13000';
 
-  const TIMELOCK = process.env.TIMELOCK_ADDR;
+  const TIMELOCK = "0xCaFc886CB1D4655193A901d9863f0163D07b3b1A";
 
 
 
@@ -46,6 +49,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer } = await getNamedAccounts();
 
+
+  console.log(ROUTER, POOL_ID, ADD_STRAT_ADDR,
+    VAULT_ADDR, BASE_TOKEN_ADDR, MASTERCHEF,
+    LIQ_STRAT_ADDR, REINVEST_BOUNTY_BPS);
+
+
   console.log(`>> Deploying an upgradable PancakeswapWorker contract for ${WORKER_NAME}`);
   const PancakeswapWorker = (await ethers.getContractFactory(
     'PancakeswapWorker',
@@ -53,8 +62,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   )) as PancakeswapWorker__factory;
   const pancakeswapWorker = await upgrades.deployProxy(
     PancakeswapWorker,[
-      VAULT_ADDR, BASE_TOKEN_ADDR, MASTER_CHEF_ADDR,
-      PANCAKESWAP_ROUTER_ADDR, POOL_ID, ADD_STRAT_ADDR,
+      ROUTER, POOL_ID, ADD_STRAT_ADDR,
+      VAULT_ADDR, BASE_TOKEN_ADDR, MASTERCHEF,
       LIQ_STRAT_ADDR, REINVEST_BOUNTY_BPS
     ],
   );

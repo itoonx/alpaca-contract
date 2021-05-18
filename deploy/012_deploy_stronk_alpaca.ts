@@ -30,7 +30,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 
   console.log(">> Deploying a StronkAlpaca contract");
-  const StronkAlpaca = (await ethers.getContractFactory(   "StronkAlpaca",    (await ethers.getSigners())[0],  )) as StronkAlpaca__factory;
+  const StronkAlpaca = (await ethers.getContractFactory("StronkAlpaca", (await ethers.getSigners())[0] )) as StronkAlpaca__factory;
   const stronkAlpaca = await StronkAlpaca.deploy(
     ALPACA_TOKEN_ADDR,
     ethers.BigNumber.from(HODLABLE_END_BLOCK),

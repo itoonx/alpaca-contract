@@ -14,9 +14,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   */
 
   const ADMIN_ADDRESS = process.env.ADMIN_ADDRESS; // Dev Address
-  const DELAY_IN_DAYS = 1;
+  // const DELAY_IN_DAYS = 1;
+  const DELAY_IN_MINUTES = 60;
 
-  const DELAY = DELAY_IN_DAYS*24*60*60;
+  // const DELAY = DELAY_IN_DAYS*24*60*60;
+  const DELAY = DELAY_IN_MINUTES
 
 
 

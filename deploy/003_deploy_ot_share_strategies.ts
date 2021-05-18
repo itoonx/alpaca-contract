@@ -15,7 +15,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   */
 
   const ROUTER = process.env.ROUTER; // testnet
-  const TIMELOCK = process.env.TIMELOCK_ADDR;
+  const TIMELOCK = "0xCaFc886CB1D4655193A901d9863f0163D07b3b1A";
 
 
 
